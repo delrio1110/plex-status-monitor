@@ -28,7 +28,7 @@
       <div class="movie-wrap">
         <img src="{{movieImg}}" class="movie-image" alt="">
         <div class="movie-duration-bar"></div>
-        <div class="movie-duration-bar-highlight" data-timeline="{{movieTimeLeft}}"></div>
+        <div class="movie-duration-bar-highlight" data-timeline="{{movieTimeLeft}}" style='width: {{movieTimeLeft}};' data-movie-index="{{movieIndex}}"></div>
       </div>
 
       <div class="movie-info">
@@ -37,7 +37,9 @@
       </div>
       <div class="user-info">
         <p class="user-name">{{this.userName}}</p>
-        <img class="user-image" src="{{userThumb}}" alt="">
+        {{#if userThumb}}
+          <img class="user-image" src="{{userThumb}}" alt="">
+        {{/if}}
       </div>
     </div>
     {{/each}}

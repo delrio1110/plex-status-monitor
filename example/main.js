@@ -1,6 +1,6 @@
 var menubar = require('menubar')
 require('electron-debug')({
-    showDevTools: true
+    showDevTools: false
 });
 var handlebars = require('handlebars');
 // var jsdom = require("jsdom");

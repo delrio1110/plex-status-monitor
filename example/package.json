@@ -4,6 +4,7 @@
   "description": "example menubar electron app",
   "dependencies": {
     "electron-debug": "^0.5.2",
+    "electron-json-storage": "^2.0.0",
     "menubar": "*"
   },
   "devDependencies": {
