@@ -3,8 +3,11 @@ window.jQuery = window.$ = require('jquery');
 var storage = require('electron-json-storage');
 // var menubar = require('menubar')
 // var mb = menubar()
-
-
+var ipcRenderer = require('electron').ipcRenderer;
+console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
+ipcRenderer.on('asynchronous-reply', function(event, arg) {
+  console.log(arg); // prints "pong"
+});
 
 var $un = $('#username')
 var $pass = $('#password')
@@ -14,7 +17,9 @@ var serverInterval = 1000 * 30 * 1; // last digit is number of minutes to ping s
 var url = 'http://';
 // var ipAddressRef =  '71.84.24.194:32400'
 
-var settings = {}
+var settings = {
+  'isActive' : false
+}
 
 storage.has('username', function(error, hasKey) {
   if (error) throw error;
@@ -152,6 +157,7 @@ function getPlexToken(userSettings) {
 
       setInterval(function() {
         plexQuery(settings.serverIp, token)
+        ipcRenderer.send('asynchronous-message', settings.isActive);
         console.log("PING SERVER EVERY 30 seconds")
       }, 2000);
 
@@ -170,6 +176,8 @@ function setHandleBarData(url, token, data) {
   console.log(data.MediaContainer['@attributes'].size)
   if (data.MediaContainer['@attributes'].size == 0) {
     $('#user-section').html('<h1>No Active Users :)</h1>')
+    settings.isActive = false
+
     return
   }
 
@@ -195,6 +203,7 @@ function setHandleBarData(url, token, data) {
     var template = Handlebars.compile(templateSource);
     var html = template(userInfo);
     $('#user-section').html(html)
+    settings.isActive = true
   }
 
   else {
@@ -223,6 +232,7 @@ function setHandleBarData(url, token, data) {
     var html = template(userInfo);
     // console.log("HTMLLL",html, "template source", templateSource, template)
     $('#user-section').html(html)
+    settings.isActive = true
   }
 }
 
