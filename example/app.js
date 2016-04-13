@@ -18,7 +18,8 @@ var url = 'http://';
 // var ipAddressRef =  '71.84.24.194:32400'
 
 var settings = {
-  'isActive' : false
+  'isActive' : false,
+  'userCount': '0'
 }
 
 storage.has('username', function(error, hasKey) {
@@ -157,7 +158,7 @@ function getPlexToken(userSettings) {
 
       setInterval(function() {
         plexQuery(settings.serverIp, token)
-        ipcRenderer.send('asynchronous-message', settings.isActive);
+        ipcRenderer.send('asynchronous-message', settings);
         console.log("PING SERVER EVERY 30 seconds")
       }, 2000);
 
@@ -177,11 +178,12 @@ function setHandleBarData(url, token, data) {
   if (data.MediaContainer['@attributes'].size == 0) {
     $('#user-section').html('<h1>No Active Users :)</h1>')
     settings.isActive = false
+    settings.userCount = '0'
 
     return
   }
 
-  else if (!Array.isArray(data.MediaContainer.Video)) {
+  else if (!Array.isArray(data.MediaContainer.Video) || !Array.isArray(data.MediaContainer.Track) || !Array.isArray(data.MediaContainer.Photo)) {
     var movieDuration = msToTime(data.MediaContainer.Video['@attributes'].duration)
     var movieOffset = msToTime(data.MediaContainer.Video['@attributes'].viewOffset)
     var moviePercentWatched = ((data.MediaContainer.Video['@attributes'].viewOffset) / (data.MediaContainer.Video['@attributes'].duration) * 100)
@@ -204,6 +206,7 @@ function setHandleBarData(url, token, data) {
     var html = template(userInfo);
     $('#user-section').html(html)
     settings.isActive = true
+    settings.userCount = '1'
   }
 
   else {
@@ -233,6 +236,7 @@ function setHandleBarData(url, token, data) {
     // console.log("HTMLLL",html, "template source", templateSource, template)
     $('#user-section').html(html)
     settings.isActive = true
+    settings.userCount = String(i)
   }
 }
 
