@@ -9,9 +9,14 @@ ipcRenderer.on('asynchronous-reply', function(event, arg) {
   console.log(arg); // prints "pong"
 });
 
+
+//TODO
+//GET PlexQuery ajax call working
+
+
 var $un = $('#username')
 var $pass = $('#password')
-var $serverIp = $('#server-ip')
+// var $serverIp = $('#server-ip')
 var token
 var serverInterval = 1000 * 30 * 1; // last digit is number of minutes to ping server
 var url = 'http://';
@@ -19,117 +24,77 @@ var url = 'http://';
 
 var settings = {
   'isActive' : false,
-  'userCount': '0'
+  'userCount': '0',
+  'plexServerPort': ':32400',
+  'loggedIn': false
 }
 
-storage.has('username', function(error, hasKey) {
-  if (error) throw error;
+// storage.has('username', function(error, hasKey) {
+//   if (error) throw error;
+//
+//   if (hasKey) {
+//     console.log('SETTINGS HAVE BEEN SAVED');
+//     storage.get('username', function(error,data) {
+//       if (error) throw error;
+//       else { settings.username = data }
+//         console.log(data)
+//     })
+//     storage.get('password', function(error,data) {
+//       if (error) throw error;
+//       else { settings.password = data }
+//         console.log('password here')
+//     })
+//     storage.get('server', function(error,data) {
+//       if (error) throw error;
+//       else { settings.serverIp = url + data }
+//         console.log(data)
+//         console.log(settings.serverIp)
+//     })
+//     console.log(settings)
+//     setTimeout(function() {
+//       getPlexToken(settings)
+//       console.log("SET TIMEOUT")
+//     }, 5000)
+//   }
+// });
 
-  if (hasKey) {
-    console.log('SETTINGS HAVE BEEN SAVED');
-    storage.get('username', function(error,data) {
-      if (error) throw error;
-      else { settings.username = data }
-        console.log(data)
-    })
-    storage.get('password', function(error,data) {
-      if (error) throw error;
-      else { settings.password = data }
-        console.log('password here')
-    })
-    storage.get('server', function(error,data) {
-      if (error) throw error;
-      else { settings.serverIp = url + data }
-        console.log(data)
-    })
-    console.log(settings)
-    setTimeout(function() {
-      getPlexToken(settings)
-      console.log("SET TIMEOUT")
-    }, 5000)
-  }
-});
-
-// Changes XML to JSON
-function xmlToJson(xml) {
-  // Create the return object
-  var obj = {};
-  if (xml.nodeType == 1) { // element
-    // do attributes
-    if (xml.attributes.length > 0) {
-        obj["@attributes"] = {};
-        for (var j = 0; j < xml.attributes.length; j++) {
-            var attribute = xml.attributes.item(j);
-            obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-        }
-    }
-  } else if (xml.nodeType == 3) { // text
-    obj = xml.nodeValue;
-  }
-
-  // do children
-  if (xml.hasChildNodes()) {
-    for (var i = 0; i < xml.childNodes.length; i++) {
-        var item = xml.childNodes.item(i);
-        var nodeName = item.nodeName;
-        if (typeof(obj[nodeName]) == "undefined") {
-            obj[nodeName] = xmlToJson(item);
-        } else {
-            if (typeof(obj[nodeName].push) == "undefined") {
-                var old = obj[nodeName];
-                obj[nodeName] = [];
-                obj[nodeName].push(old);
-            }
-            obj[nodeName].push(xmlToJson(item));
-        }
-    }
-  }
-  return obj;
-};
-
-function msToTime(duration) {
-  var milliseconds = parseInt((duration%1000)/100)
-      , seconds = parseInt((duration/1000)%60)
-      , minutes = parseInt((duration/(1000*60))%60)
-      , hours = parseInt((duration/(1000*60*60))%24);
-
-  hours = (hours < 10) ? "0" + hours : hours;
-  minutes = (minutes < 10) ? "0" + minutes : minutes;
-  seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-  return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
-}
-
-function plexQuery(url, token) {
+function plexQuery(ip, token) {
+  console.log("PLEX QUERY START", ip, token)
+  console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
+  console.log("SETTINGS: ", settings)
   $.ajax({
-    url: url + '/status/sessions'+ '?X-Plex-Token='+token,
-    type: 'GET',
+    //url: ip + '/status/sessions'+ '?X-Plex-Token='+ token,
+    url: ip + '/status/sessions' + '?X-Plex-Token=' + token,
+    type: 'POST',
     dataType: 'xml'
+    // headers: {'X-Plex-Token': token}
   })
   .done(function(data) {
-    console.log("INFO GET SUCCESS")
+    console.log("PLEX QUERY SUCCESS")
     var jsonData = xmlToJson(data)
     console.log(data)
     console.log(jsonData)
     // console.log(jsonData.MediaContainer.Video['@attributes'].art)
 
-    setHandleBarData(url, token, jsonData)
+    setHandleBarData(ip, token, jsonData)
+    console.log('LoggedIn: ', settings.loggedIn)
+    while (settings.loggedIn) {
+        console.log("PING SERVER EVERY 30 seconds")
+        setTimeout(plexQuery(ip, token), serverInterval);
+    }
 
     // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
   })
   .fail(function(data) {
-    console.log("error");
+    console.log("PLEX QUERY ERROR!");
     console.log(data);
   })
   .always(function() {
-    console.log("complete");
+    console.log("PLEX QUERY RUN");
   });
 }
 
 function getPlexToken(userSettings) {
-  // console.log(userSettings)
-  // console.log(userSettings[username])
-  // console.log(userSettings.username, userSettings.password)
   $.ajax({
       url: 'https://plex.tv/users/sign_in.json',
       type: 'POST',
@@ -137,7 +102,7 @@ function getPlexToken(userSettings) {
       beforeSend: function (json) {
         json.setRequestHeader ("Authorization", "Basic " + btoa(userSettings.username + ":" + userSettings.password));
       },
-      data: {
+      headers: {
         'X-Plex-Platform': 'MacOSX',
         'X-Plex-Platform-Version': '10.10.5',
         'X-Plex-Provides': '1',
@@ -149,41 +114,67 @@ function getPlexToken(userSettings) {
       }
     })
     .done(function(data) {
-      console.log("DONE!!!!", data)
+      console.log("PLEX TOKEN ACQUIRED.", data)
       token = data.user.authentication_token;
-      console.log(token)
+      settings.plexToken = token;
+      console.log("PLEX TOKEN: ", token);
+      settings.loggedIn = true;
 
       // plexQuery(url, token)
       $('#login').hide()
 
-      setInterval(function() {
-        plexQuery(settings.serverIp, token)
-        ipcRenderer.send('asynchronous-message', settings);
-        console.log("PING SERVER EVERY 30 seconds")
-      }, 2000);
-
-
+      getPlexIp(token);
     })
     .fail(function(data) {
       console.log("FAIL!!!!", data)
     })
     .always(function() {
-      console.log("complete");
+      console.log("Get Plex Token Complete");
+    });
+}
+
+function getPlexIp(token) {
+  var ip;
+  $.ajax({
+      url: 'https://plex.tv/pms/:/ip',
+      type: 'POST',
+      headers: {
+        'X-Plex-Token': token
+      }
+    })
+    .done(function(data) {
+      console.log("PLEX IP ACQUIRED");
+      console.log("Server Public IP Address: ", data);
+      console.log("dataType: ", typeof(data));
+      ip = data;
+      ip = ip.replace(/\s+/g, ''); //clear empty space from string
+      ip += settings.plexServerPort; //add port to ip
+      settings.plexServerIp = ip; // save to settings
+      console.log(settings.plexServerIp);
+
+      plexQuery(ip, token);
+    })
+    .fail(function(data) {
+      console.log("FAIL!!!!", data);
+    })
+    .always(function() {
+      console.log("Get Plex Ip Complete");
     });
 }
 
 function setHandleBarData(url, token, data) {
   var userInfo = [];
-  console.log(data.MediaContainer['@attributes'].size)
+  console.log(data.MediaContainer['@attributes'].size);
   if (data.MediaContainer['@attributes'].size == 0) {
     $('#user-section').html('<h1>No Active Users :)</h1>')
-    settings.isActive = false
-    settings.userCount = '0'
+    settings.isActive = false;
+    settings.userCount = '0';
 
-    return
+    return;
   }
 
-  else if (!Array.isArray(data.MediaContainer.Video) || !Array.isArray(data.MediaContainer.Track) || !Array.isArray(data.MediaContainer.Photo)) {
+  else if (!Array.isArray(data.MediaContainer.Video)) {
+    //|| !Array.isArray(data.MediaContainer.Track) || !Array.isArray(data.MediaContainer.Photo)
     var movieDuration = msToTime(data.MediaContainer.Video['@attributes'].duration)
     var movieOffset = msToTime(data.MediaContainer.Video['@attributes'].viewOffset)
     var moviePercentWatched = ((data.MediaContainer.Video['@attributes'].viewOffset) / (data.MediaContainer.Video['@attributes'].duration) * 100)
@@ -245,11 +236,11 @@ function setHandleBarData(url, token, data) {
 $('.plex-button').click(function() {
   settings.username = $un.val()
   settings.password = $pass.val()
-  settings.serverIp = $serverIp.val()
+  // settings.serverIp = $serverIp.val()
 
   storage.set('username', settings.username)
   storage.set('password', settings.password)
-  storage.set('server', settings.serverIp)
+  // storage.set('server', settings.serverIp)
 
   storage.has('username', function(error, hasKey) {
     if (error) throw error;
@@ -261,9 +252,11 @@ $('.plex-button').click(function() {
 
   // var url = 'http://71.84.24.194:32400';
   console.log('click')
-  getPlexToken(settings);
 
+
+  setTimeout(function() {
+    getPlexToken(settings)
+    console.log("SET TIMEOUT")
+  }, 5000)
 
 });
-
-
