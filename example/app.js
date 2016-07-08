@@ -135,6 +135,7 @@ function getPlexIp(token) {
       }
 
       plexQuery(ip, token);
+      // setInterval(plexQuery(ip, token), serverInterval);
 
     })
     .fail(function(data) {
@@ -165,7 +166,7 @@ function plexQuery(ip, token) {
       console.log("PING SERVER EVERY 30 seconds")
       console.log("SERVER INTERVAL:", serverInterval);
       setTimeout(plexQuery(ip, token), serverInterval);
-      console.log("AFTER TIMEOUT")
+      // console.log("AFTER TIMEOUT")
 
     // }
 
@@ -187,6 +188,7 @@ function setHandleBarData(url, token, data) {
     $('#user-section').html('<h1>No Active Users :)</h1>')
     settings.isActive = false;
     settings.userCount = '0';
+    ipcRenderer.send('asynchronous-message', settings);
 
     return;
   }
@@ -251,6 +253,7 @@ function setHandleBarData(url, token, data) {
     $('#user-section').html(html)
     settings.isActive = true
     settings.userCount = String(i)
+    ipcRenderer.send('asynchronous-message', settings);
   }
 }
 
