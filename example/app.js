@@ -58,42 +58,6 @@ var settings = {
 //   }
 // });
 
-function plexQuery(ip, token) {
-  console.log("PLEX QUERY START", ip, token)
-  console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
-  console.log("SETTINGS: ", settings)
-  $.ajax({
-    //url: ip + '/status/sessions'+ '?X-Plex-Token='+ token,
-    url: ip + '/status/sessions' + '?X-Plex-Token=' + token,
-    type: 'GET',
-    dataType: 'xml'
-    // headers: {'X-Plex-Token': token}
-  })
-  .done(function(data) {
-    console.log("PLEX QUERY SUCCESS")
-    var jsonData = xmlToJson(data)
-    console.log(data)
-    console.log(jsonData)
-    // console.log(jsonData.MediaContainer.Video['@attributes'].art)
-
-    setHandleBarData(ip, token, jsonData)
-    console.log('LoggedIn: ', settings.loggedIn)
-    while (settings.loggedIn) {
-        console.log("PING SERVER EVERY 30 seconds")
-        setTimeout(plexQuery(ip, token), serverInterval);
-    }
-
-    // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
-  })
-  .fail(function(data) {
-    console.log("PLEX QUERY ERROR!");
-    console.log(data);
-  })
-  .always(function() {
-    console.log("PLEX QUERY RUN");
-  });
-}
-
 function getPlexToken(userSettings) {
   $.ajax({
       url: 'https://plex.tv/users/sign_in.json',
@@ -141,16 +105,37 @@ function getPlexIp(token) {
       dataType: 'xml'
     })
     .done(function(data) {
-      console.log("PLEX IP ACQUIRED");
-      console.log("Server Public IP Address: ", data);
+      console.log("Get Plex Ip Done");
       var jsonData = xmlToJson(data)
-      console.log(jsonData);
-      // settings.plexServerIp = ip; // save to settings
-      // console.log(settings.plexServerIp);
 
-      setTimeout(function() {
-        plexQuery(ip, token);
-      }, 3000);
+      //Set Device data to an array in case user has more than 1 server objects
+      if (!Array.isArray(jsonData.MediaContainer.Device)) {
+        jsonData.MediaContainer.Device = [jsonData.MediaContainer.Device];
+      }
+
+      for ( i=0; i < jsonData.MediaContainer.Device.length; i++ ) {
+        if (jsonData.MediaContainer.Device[i]['@attributes'].accessToken == token) {
+          //Set Connection data to an array in case user has more than 1 connection objects
+          if (!Array.isArray(jsonData.MediaContainer.Device[i].Connection)) {
+            jsonData.MediaContainer.Device[i].Connection = [jsonData.MediaContainer.Device[i].Connection];
+          }
+
+          for ( j=0; j < jsonData.MediaContainer.Device[i].Connection.length; j++ ) {
+            // console.log(jsonData.MediaContainer.Device[i].Connection[j]);
+            // console.log(jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local);
+
+            if (jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local == '0') {
+              ip = jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].uri;
+              console.log("MY SERVER IP ADDRESS: ", ip);
+              break;
+            }
+          }
+        }
+        //Make Another break here if ip variable has a length??
+      }
+
+      plexQuery(ip, token);
+
     })
     .fail(function(data) {
       console.log("FAIL!!!!", data);
@@ -158,6 +143,41 @@ function getPlexIp(token) {
     .always(function() {
       console.log("Get Plex Ip Complete");
     });
+}
+
+function plexQuery(ip, token) {
+  console.log("PLEX QUERY START", ip, token)
+  console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
+  console.log("SETTINGS: ", settings)
+  $.ajax({
+    url: ip + '/status/sessions?X-Plex-Token=' + token,
+    type: 'GET',
+    dataType: 'xml'
+  })
+  .done(function(data) {
+    console.log("PLEX QUERY SUCCESS")
+    var jsonData = xmlToJson(data)
+    console.log(jsonData)
+
+    setHandleBarData(ip, token, jsonData)
+    console.log('LoggedIn: ', settings.loggedIn)
+    // while (settings.loggedIn) {
+      console.log("PING SERVER EVERY 30 seconds")
+      console.log("SERVER INTERVAL:", serverInterval);
+      setTimeout(plexQuery(ip, token), serverInterval);
+      console.log("AFTER TIMEOUT")
+
+    // }
+
+    // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
+  })
+  .fail(function(data) {
+    console.log("PLEX QUERY ERROR!");
+    console.log(data);
+  })
+  .always(function() {
+    console.log("PLEX QUERY RUN");
+  });
 }
 
 function setHandleBarData(url, token, data) {
@@ -253,13 +273,9 @@ $('.plex-button').click(function() {
     }
   });
 
-  // var url = 'http://71.84.24.194:32400';
-  console.log('click')
-
-
   setTimeout(function() {
-    getPlexToken(settings)
-    console.log("SET TIMEOUT")
-  }, 5000)
+    console.log("Login Start");
+    getPlexToken(settings);
+  }, 5000);
 
 });
