@@ -65,7 +65,7 @@ function plexQuery(ip, token) {
   $.ajax({
     //url: ip + '/status/sessions'+ '?X-Plex-Token='+ token,
     url: ip + '/status/sessions' + '?X-Plex-Token=' + token,
-    type: 'POST',
+    type: 'GET',
     dataType: 'xml'
     // headers: {'X-Plex-Token': token}
   })
@@ -136,23 +136,21 @@ function getPlexToken(userSettings) {
 function getPlexIp(token) {
   var ip;
   $.ajax({
-      url: 'https://plex.tv/pms/:/ip',
-      type: 'POST',
-      headers: {
-        'X-Plex-Token': token
-      }
+      url: 'https://plex.tv/api/resources?X-Plex-Token=' + token,
+      type: 'GET',
+      dataType: 'xml'
     })
     .done(function(data) {
       console.log("PLEX IP ACQUIRED");
       console.log("Server Public IP Address: ", data);
-      console.log("dataType: ", typeof(data));
-      ip = data;
-      ip = ip.replace(/\s+/g, ''); //clear empty space from string
-      ip += settings.plexServerPort; //add port to ip
-      settings.plexServerIp = ip; // save to settings
-      console.log(settings.plexServerIp);
+      var jsonData = xmlToJson(data)
+      console.log(jsonData);
+      // settings.plexServerIp = ip; // save to settings
+      // console.log(settings.plexServerIp);
 
-      plexQuery(ip, token);
+      setTimeout(function() {
+        plexQuery(ip, token);
+      }, 3000);
     })
     .fail(function(data) {
       console.log("FAIL!!!!", data);
@@ -173,34 +171,39 @@ function setHandleBarData(url, token, data) {
     return;
   }
 
-  else if (!Array.isArray(data.MediaContainer.Video)) {
-    //|| !Array.isArray(data.MediaContainer.Track) || !Array.isArray(data.MediaContainer.Photo)
-    var movieDuration = msToTime(data.MediaContainer.Video['@attributes'].duration)
-    var movieOffset = msToTime(data.MediaContainer.Video['@attributes'].viewOffset)
-    var moviePercentWatched = ((data.MediaContainer.Video['@attributes'].viewOffset) / (data.MediaContainer.Video['@attributes'].duration) * 100)
-    console.log("MOVIE DURATION: ", movieDuration)
-    console.log("MOVIE WATCHED: ", movieOffset)
-    userInfo.push({
-      movieTitle: data.MediaContainer.Video['@attributes'].title,
-      userThumb: data.MediaContainer.Video.User['@attributes'].thumb,
-      userName: data.MediaContainer.Video.User['@attributes'].title,
-      movieImg: url + data.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token,
-      movieYear: data.MediaContainer.Video['@attributes'].year,
-      movieDuration: movieDuration,
-      movieOffset: movieOffset,
-      movieTimeLeft: moviePercentWatched+'%'
-    })
-    // $('.movie-duration-bar-highlight[data-movie-index=' + userInfo[0].movieIndex + ']').width(userInfo[0].movieTimeLeft)
+  // else if (!Array.isArray(data.MediaContainer.Video)) {
+  //   //|| !Array.isArray(data.MediaContainer.Track) || !Array.isArray(data.MediaContainer.Photo)
+  //   var movieDuration = msToTime(data.MediaContainer.Video['@attributes'].duration)
+  //   var movieOffset = msToTime(data.MediaContainer.Video['@attributes'].viewOffset)
+  //   var moviePercentWatched = ((data.MediaContainer.Video['@attributes'].viewOffset) / (data.MediaContainer.Video['@attributes'].duration) * 100)
+  //   console.log("MOVIE DURATION: ", movieDuration)
+  //   console.log("MOVIE WATCHED: ", movieOffset)
+  //   userInfo.push({
+  //     movieTitle: data.MediaContainer.Video['@attributes'].title,
+  //     userThumb: data.MediaContainer.Video.User['@attributes'].thumb,
+  //     userName: data.MediaContainer.Video.User['@attributes'].title,
+  //     movieImg: url + data.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token,
+  //     movieYear: data.MediaContainer.Video['@attributes'].year,
+  //     movieDuration: movieDuration,
+  //     movieOffset: movieOffset,
+  //     movieTimeLeft: moviePercentWatched+'%'
+  //   })
+  //   // $('.movie-duration-bar-highlight[data-movie-index=' + userInfo[0].movieIndex + ']').width(userInfo[0].movieTimeLeft)
+  //
+  //   var templateSource = $("#active-users").html();
+  //   var template = Handlebars.compile(templateSource);
+  //   var html = template(userInfo);
+  //   $('#user-section').html(html)
+  //   settings.isActive = true
+  //   settings.userCount = '1'
+  // }
 
-    var templateSource = $("#active-users").html();
-    var template = Handlebars.compile(templateSource);
-    var html = template(userInfo);
-    $('#user-section').html(html)
-    settings.isActive = true
-    settings.userCount = '1'
-  }
 
   else {
+    if (!Array.isArray(data.MediaContainer.Video)) {
+      //IF NOT ARRAY MAKE IT AN ARRAY!
+      data.MediaContainer.Video = [data.MediaContainer.Video];
+    }
     for (var i=0; i<data.MediaContainer.Video.length; i++) {
       var movieDuration = msToTime(data.MediaContainer.Video[i]['@attributes'].duration)
       var movieOffset = msToTime(data.MediaContainer.Video[i]['@attributes'].viewOffset)
