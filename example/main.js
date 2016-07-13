@@ -24,9 +24,6 @@ mb.on('ready', function ready () {
   console.log('app is ready')
   mb.setOption('icon', 'IconActive.png');
   mb.tray.setPressedImage('IconPressed.png')
-  // console.log(mb.app)
-  // console.log(mb.app.getPath())
-  // mb.app.quit()
 })
 
 
@@ -34,14 +31,16 @@ var ipcMain = require('electron').ipcMain;
   ipcMain.on('asynchronous-message', function(event, appState) {
     console.log(appState);  // prints "ping"
     if (appState.isActive) {
-      
+
       mb.tray.setImage('IconActive.png')
+      mb.tray.setPressedImage('IconPressed.png')
       mb.tray.setTitle(appState.userCount)
       console.log(mb.getOption('icon'))
       console.log('ACTIVE APP')
     }
     else {
        mb.tray.setImage('IconTemplate.png')
+       mb.tray.setPressedImage('IconPressed.png')
        mb.tray.setTitle('')
       console.log('InACTIVE APP')
     }

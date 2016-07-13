@@ -18,7 +18,7 @@ var $un = $('#username')
 var $pass = $('#password')
 // var $serverIp = $('#server-ip')
 var token
-var serverInterval = 1000 * 30 * 1; // last digit is number of minutes to ping server
+var serverInterval = 1000 * 30; // 30s between server ping
 var url = 'http://';
 // var ipAddressRef =  '71.84.24.194:32400'
 
@@ -135,7 +135,6 @@ function getPlexIp(token) {
       }
 
       plexQuery(ip, token);
-      // setInterval(plexQuery(ip, token), serverInterval);
 
     })
     .fail(function(data) {
@@ -165,7 +164,9 @@ function plexQuery(ip, token) {
     // while (settings.loggedIn) {
       console.log("PING SERVER EVERY 30 seconds")
       console.log("SERVER INTERVAL:", serverInterval);
-      setTimeout(plexQuery(ip, token), serverInterval);
+      setTimeout(function() {
+        plexQuery(ip, token);
+      }, serverInterval);
       // console.log("AFTER TIMEOUT")
 
     // }
@@ -222,6 +223,13 @@ function setHandleBarData(url, token, data) {
 
 
   else {
+    console.log(data.MediaContainer);
+    if (!Array.isArray(data.MediaContainer.Track)) {
+      //IF NOT ARRAY MAKE IT AN ARRAY!
+      data.MediaContainer.Track = [data.MediaContainer.Track];
+    }
+
+    //MOVIE / TV SHOW DATA
     if (!Array.isArray(data.MediaContainer.Video)) {
       //IF NOT ARRAY MAKE IT AN ARRAY!
       data.MediaContainer.Video = [data.MediaContainer.Video];
@@ -280,5 +288,4 @@ $('.plex-button').click(function() {
     console.log("Login Start");
     getPlexToken(settings);
   }, 5000);
-
 });
