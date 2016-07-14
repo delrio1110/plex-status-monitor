@@ -12,37 +12,34 @@ function msToTime(duration) {
 }
 
 function xmlToJson(xml) {
-  // Create the return object
-  var obj = {};
-  if (xml.nodeType == 1) { // element
-    // do attributes
-    if (xml.attributes.length > 0) {
-        obj["@attributes"] = {};
-        for (var j = 0; j < xml.attributes.length; j++) {
-            var attribute = xml.attributes.item(j);
-            obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-        }
-    }
-  } else if (xml.nodeType == 3) { // text
-    obj = xml.nodeValue;
-  }
+    var attr,
+        child,
+        attrs = xml.attributes,
+        children = xml.childNodes,
+        key = xml.nodeType,
+        obj = {},
+        i = -1;
 
-  // do children
-  if (xml.hasChildNodes()) {
-    for (var i = 0; i < xml.childNodes.length; i++) {
-        var item = xml.childNodes.item(i);
-        var nodeName = item.nodeName;
-        if (typeof(obj[nodeName]) == "undefined") {
-            obj[nodeName] = xmlToJson(item);
-        } else {
-            if (typeof(obj[nodeName].push) == "undefined") {
-                var old = obj[nodeName];
-                obj[nodeName] = [];
-                obj[nodeName].push(old);
-            }
-            obj[nodeName].push(xmlToJson(item));
-        }
+    if (key == 1 && attrs.length) {
+      obj[key = '@attributes'] = {};
+      while (attr = attrs.item(++i)) {
+        obj[key][attr.nodeName] = attr.nodeValue;
+      }
+      i = -1;
+    } else if (key == 3) {
+      obj = xml.nodeValue;
     }
+    while (child = children.item(++i)) {
+      key = child.nodeName;
+      if (obj.hasOwnProperty(key)) {
+        if (obj.toString.call(obj[key]) != '[object Array]') {
+          obj[key] = [obj[key]];
+        }
+        obj[key].push(xmlToJson(child));
+      }
+      else {
+        obj[key] = xmlToJson(child);
+      }
+    }
+    return obj;
   }
-  return obj;
-};

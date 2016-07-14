@@ -89,24 +89,24 @@ input {
   position: relative;
 }
 
-.movie-info {
+.media-info {
   display: inline-block;
   float: left;
   width: 50%;
 }
 
-.movie-year {
+.media-year {
   margin: 0 10px 0;
 }
 
-.movie-wrap, .movie-image {
+.media-wrap, .media-image {
   width: 100%;
   display: block;
   margin: 0 auto;
   position: relative;
 }
 
-.movie-duration-bar {
+.media-duration-bar {
   position: absolute;
   bottom: 0;
   height: 5px;
@@ -115,7 +115,7 @@ input {
   opacity: 0.8;
 }
 
-.movie-duration-bar-highlight {
+.media-duration-bar-highlight {
   position: absolute;
   bottom: 0;
   height: 5px;

@@ -150,16 +150,23 @@ function plexQuery(ip, token) {
   console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
   console.log("SETTINGS: ", settings)
   $.ajax({
-    url: ip + '/status/sessions?X-Plex-Token=' + token,
+    //url: ip + '/status/sessions?X-Plex-Token=' + token,
+    url: ip + '/status/sessions',
     type: 'GET',
-    dataType: 'xml'
+    dataType: 'json',
+    headers: {
+      'Accept': 'application/json',
+      'X-Plex-Token': token
+    }
+
   })
   .done(function(data) {
     console.log("PLEX QUERY SUCCESS")
-    var jsonData = xmlToJson(data)
-    console.log(jsonData)
+    console.log(data);
+    // var jsonData = xmlToJson(data)
+    // console.log(jsonData)
 
-    setHandleBarData(ip, token, jsonData)
+    setHandleBarData(ip, token, data)
     console.log('LoggedIn: ', settings.loggedIn)
     // while (settings.loggedIn) {
       console.log("PING SERVER EVERY 30 seconds")
@@ -184,8 +191,9 @@ function plexQuery(ip, token) {
 
 function setHandleBarData(url, token, data) {
   var userInfo = [];
-  console.log(data.MediaContainer['@attributes'].size);
-  if (data.MediaContainer['@attributes'].size == 0) {
+  console.log(data._children);
+  // console.log(data.MediaContainer['@attributes'].size);
+  if (data._children.size == 0) {
     $('#user-section').html('<h1>No Active Users :)</h1>')
     settings.isActive = false;
     settings.userCount = '0';
@@ -194,63 +202,51 @@ function setHandleBarData(url, token, data) {
     return;
   }
 
-  // else if (!Array.isArray(data.MediaContainer.Video)) {
-  //   //|| !Array.isArray(data.MediaContainer.Track) || !Array.isArray(data.MediaContainer.Photo)
-  //   var movieDuration = msToTime(data.MediaContainer.Video['@attributes'].duration)
-  //   var movieOffset = msToTime(data.MediaContainer.Video['@attributes'].viewOffset)
-  //   var moviePercentWatched = ((data.MediaContainer.Video['@attributes'].viewOffset) / (data.MediaContainer.Video['@attributes'].duration) * 100)
-  //   console.log("MOVIE DURATION: ", movieDuration)
-  //   console.log("MOVIE WATCHED: ", movieOffset)
-  //   userInfo.push({
-  //     movieTitle: data.MediaContainer.Video['@attributes'].title,
-  //     userThumb: data.MediaContainer.Video.User['@attributes'].thumb,
-  //     userName: data.MediaContainer.Video.User['@attributes'].title,
-  //     movieImg: url + data.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token,
-  //     movieYear: data.MediaContainer.Video['@attributes'].year,
-  //     movieDuration: movieDuration,
-  //     movieOffset: movieOffset,
-  //     movieTimeLeft: moviePercentWatched+'%'
-  //   })
-  //   // $('.movie-duration-bar-highlight[data-movie-index=' + userInfo[0].movieIndex + ']').width(userInfo[0].movieTimeLeft)
-  //
-  //   var templateSource = $("#active-users").html();
-  //   var template = Handlebars.compile(templateSource);
-  //   var html = template(userInfo);
-  //   $('#user-section').html(html)
-  //   settings.isActive = true
-  //   settings.userCount = '1'
-  // }
-
-
   else {
-    console.log(data.MediaContainer);
-    if (!Array.isArray(data.MediaContainer.Track)) {
-      //IF NOT ARRAY MAKE IT AN ARRAY!
-      data.MediaContainer.Track = [data.MediaContainer.Track];
-    }
+    console.log(data);
+    console.log(data._children);
+
+
+    // if (!Array.isArray(data.MediaContainer.Track)) {
+    //   //IF NOT ARRAY MAKE IT AN ARRAY!
+    //   data.MediaContainer.Track = [data.MediaContainer.Track];
+    // }
+
+    // for (var i=0; i<data._children.length; i++) {
+    //
+    // }
 
     //MOVIE / TV SHOW DATA
-    if (!Array.isArray(data.MediaContainer.Video)) {
-      //IF NOT ARRAY MAKE IT AN ARRAY!
-      data.MediaContainer.Video = [data.MediaContainer.Video];
-    }
-    for (var i=0; i<data.MediaContainer.Video.length; i++) {
-      var movieDuration = msToTime(data.MediaContainer.Video[i]['@attributes'].duration)
-      var movieOffset = msToTime(data.MediaContainer.Video[i]['@attributes'].viewOffset)
-      var moviePercentWatched = ((data.MediaContainer.Video[i]['@attributes'].viewOffset) / (data.MediaContainer.Video[i]['@attributes'].duration) * 100)
+    // if (!Array.isArray(data.MediaContainer.Video)) {
+    //   //IF NOT ARRAY MAKE IT AN ARRAY!
+    //   data.MediaContainer.Video = [data.MediaContainer.Video];
+    // }
+    for (var i=0; i<data._children.length; i++) {
+      var mediaDuration = msToTime(data._children[i].duration)
+      var mediaOffset = msToTime(data._children[i].viewOffset)
+      var mediaPercentWatched = ((data._children[i].viewOffset) / (data._children[i].duration) * 100)
 
-      console.log("MOVIE DURATION: ", movieDuration)
-      console.log("MOVIE WATCHED: ", movieOffset)
-      console.log(data.MediaContainer.Video[i]['@attributes'])
+      console.log("MOVIE DURATION: ", mediaDuration)
+      console.log("MOVIE WATCHED: ", mediaOffset)
+      console.log(data._children[i]._children)
+      if (Array.isArray(data._children[i]._children)) {
+        console.log(data._children[i]._children)
+        for (var j=0; j<data._children[i]._children.length; j++) {
+          console.log(data._children[i]._children[j]._elementType)
+        }
+        // data._children[i]._children = {data._children[i]._children}
+      }
+      console.log(data._children[i]._children)
+
       userInfo.push({
-        movieTitle: data.MediaContainer.Video[i]['@attributes'].title,
-        userThumb: data.MediaContainer.Video[i].User['@attributes'].thumb,
-        userName: data.MediaContainer.Video[i].User['@attributes'].title,
-        movieImg: url + data.MediaContainer.Video[i]['@attributes'].art + '?X-Plex-Token=' + token,
-        movieYear: data.MediaContainer.Video[i]['@attributes'].year,
-        movieDuration: movieDuration,
-        movieOffset: movieOffset,
-        movieTimeLeft: moviePercentWatched + '%'
+        mediaTitle: data._children[i].title,
+        userThumb: data._children[i]._children[1].thumb,
+        userName: data._children[i]._children[1].title,
+        mediaImg: url + data._children[i].art + '?X-Plex-Token=' + token,
+        mediaYear: data._children[i].year,
+        mediaDuration: mediaDuration,
+        mediaOffset: mediaOffset,
+        mediaTimeLeft: mediaPercentWatched + '%'
       })
 
     }

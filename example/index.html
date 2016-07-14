@@ -25,15 +25,15 @@
   <script id="active-users" type="text/x-handlebars-template">
     {{#each this}}
     <div class="user-wrapper">
-      <div class="movie-wrap">
-        <img src="{{movieImg}}" class="movie-image" alt="">
-        <div class="movie-duration-bar"></div>
-        <div class="movie-duration-bar-highlight" data-timeline="{{movieTimeLeft}}" style='width: {{movieTimeLeft}};' data-movie-index="{{movieIndex}}"></div>
+      <div class="media-wrap">
+        <img src="{{mediaImg}}" class="media-image" alt="">
+        <div class="media-duration-bar"></div>
+        <div class="media-duration-bar-highlight" data-timeline="{{mediaTimeLeft}}" style='width: {{mediaTimeLeft}};' data-media-index="{{movieIndex}}"></div>
       </div>
 
       <div class="movie-info">
-        <h4 class="movie-title">{{this.movieTitle}}</h4>
-        <p class="movie-year">{{this.movieYear}}</p>
+        <h4 class="movie-title">{{this.mediaTitle}}</h4>
+        <p class="movie-year">{{this.mediaYear}}</p>
       </div>
       <div class="user-info">
         <p class="user-name">{{this.userName}}</p>
