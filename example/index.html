@@ -1,77 +1,77 @@
 <html>
-<head>
-<title>Status Monitor</title>
-<link rel="stylesheet" href="main.css">
-</head>
-<body>
-  <header>
-    <img src="images/plex-white.png" alt="plex logo">
-    <h1>Status Monitor</h1>
-  </header>
-  <form id="login">
-    <h2>Sign in to plex:</h2>
-    <label>Username:</label>
-    <input type="text" id="username" placeholder="Username or Email">
-    <label>Password:</label>
-    <input type="password" id="password" placeholder="Password">
-    <!-- <label>Server IP:</label>
-    <input type="text" id="server-ip"> -->
-    <input type="submit" style="visibility: hidden;" />
-    <div class="plex-button" id="login-button">Launch</div>
-  </form>
+  <head>
+    <title>Status Monitor</title>
+    <link rel="stylesheet" href="main.css">
+  </head>
+  <body>
+    <header>
+      <img src="images/plex-white.png" alt="plex logo">
+      <h1>Status Monitor</h1>
+    </header>
+    <form id="login">
+      <h2>Sign in to plex:</h2>
+      <label>Username:</label>
+      <input type="text" id="username" placeholder="Username or Email">
+      <label>Password:</label>
+      <input type="password" id="password" placeholder="Password">
+      <!-- <label>Server IP:</label>
+      <input type="text" id="server-ip"> -->
+      <input type="submit" style="visibility: hidden;" />
+      <div class="plex-button" id="login-button">Launch</div>
+    </form>
 
-  <section id="user-section">
-  </section>
+    <section id="user-section">
+    </section>
 
-  <script id="active-users" type="text/x-handlebars-template">
-    {{#each this}}
-    <div class="media-wrapper clearfix">
-      <div class="media-content-wrap">
-        <img src="{{mediaImg}}" class="media-image" alt="">
-        <div class="media-duration-bar"></div>
-        <div class="media-duration-bar-highlight" data-timeline="{{mediaTimeLeft}}" style='width: {{mediaTimeLeft}};' data-media-index="{{movieIndex}}"></div>
+    <script id="active-users" type="text/x-handlebars-template">
+      {{#each this}}
+      <div class="media-wrapper clearfix">
+        <div class="media-content-wrap">
+          <img src="{{mediaImg}}" class="media-image" alt="">
+          <div class="media-duration-bar"></div>
+          <div class="media-duration-bar-highlight" data-timeline="{{mediaTimeLeft}}" style='width: {{mediaTimeLeft}};' data-media-index="{{movieIndex}}"></div>
+        </div>
+
+        <div class="media-info-wrap">
+          <h4 class="movie-title">{{this.mediaTitle}}</h4>
+          <p class="media-year">{{this.mediaYear}}</p>
+        </div>
+        <div class="user-info-wrap">
+          <p class="user-name">{{this.userName}}</p>
+          {{#if userThumb}}
+            <img class="user-image" src="{{userThumb}}" alt="">
+          {{/if}}
+        </div>
       </div>
+      {{/each}}
+    </script>
 
-      <div class="media-info-wrap">
-        <h4 class="movie-title">{{this.mediaTitle}}</h4>
-        <p class="media-year">{{this.mediaYear}}</p>
+    <div class="plex-button" id="logout-button">Logout</div>
+
+  <!--   <section>
+      <a class="media-poster-container " href="#">
+      <div class="media-poster">
+      <div class="media-poster-overlay"></div>
+      <div class="media-poster-top-overlay"></div>
+      <div class="media-poster-actions">
+        <button class="play-btn media-poster-btn btn-link" tabindex="-1">
+            <i class="glyphicon play"></i>
+        </button>
+        <button class="edit-btn media-poster-btn btn-link" tabindex="-1">
+          <i class="glyphicon pencil"></i>
+        </button>
+        <button class="info-btn media-poster-btn btn-link" tabindex="-1">
+          <i class="glyphicon circle-info"></i>
+        </button>
       </div>
-      <div class="user-info-wrap">
-        <p class="user-name">{{this.userName}}</p>
-        {{#if userThumb}}
-          <img class="user-image" src="{{userThumb}}" alt="">
-        {{/if}}
-      </div>
-    </div>
-    {{/each}}
-  </script>
-
-  <div class="plex-button" id="logout-button">Logout</div>
-
-<!--   <section>
-    <a class="media-poster-container " href="#">
-    <div class="media-poster">
-    <div class="media-poster-overlay"></div>
-    <div class="media-poster-top-overlay"></div>
-    <div class="media-poster-actions">
-      <button class="play-btn media-poster-btn btn-link" tabindex="-1">
-          <i class="glyphicon play"></i>
-      </button>
-      <button class="edit-btn media-poster-btn btn-link" tabindex="-1">
-        <i class="glyphicon pencil"></i>
-      </button>
-      <button class="info-btn media-poster-btn btn-link" tabindex="-1">
-        <i class="glyphicon circle-info"></i>
-      </button>
-    </div>
-    <button class="close-btn btn-link btn-gray" href="#"><i class="glyphicon remove-2"></i></button> <i class="device-icon device-icon-chrome"></i> <div class="session-player">Plex Web (Chrome)</div> <div class="session-state">Paused</div> <div class="session-transcode-details"> <p class="session-transcode-title"> <span class="session-transcode">Transcoding</span> <span class="session-transcode-throttled hidden"></span> </p> <p class="session-transcode-video"> <span class="session-transcode-label">Video</span> <span class="session-transcode-video-decision">Transcode (h264)</span> </p> <p class="session-transcode-audio"> <span class="session-transcode-label">Audio</span> <span class="session-transcode-audio-decision">Direct Stream</span> </p> </div> <div class="media-progress"><div class=""><div class="media-progress-track"></div> <div class="media-progress-pct" style="width: 85%;"></div> </div></div> </div> <div class="session-user pull-right"> <div class="user-poster img-circle loaded" style="background-image: url(&quot;blob:https%3A//app.plex.tv/a06a8a62-15d9-482d-8e77-cbd99edfe7ee&quot;);"></div> <div class="session-username media-heading secondary">kknopper</div> </div> <div class="media-title media-heading">The Peanuts Movie</div> <div class="media-subtitle-1 media-heading secondary">2015</div> </a>
-  </section> -->
+      <button class="close-btn btn-link btn-gray" href="#"><i class="glyphicon remove-2"></i></button> <i class="device-icon device-icon-chrome"></i> <div class="session-player">Plex Web (Chrome)</div> <div class="session-state">Paused</div> <div class="session-transcode-details"> <p class="session-transcode-title"> <span class="session-transcode">Transcoding</span> <span class="session-transcode-throttled hidden"></span> </p> <p class="session-transcode-video"> <span class="session-transcode-label">Video</span> <span class="session-transcode-video-decision">Transcode (h264)</span> </p> <p class="session-transcode-audio"> <span class="session-transcode-label">Audio</span> <span class="session-transcode-audio-decision">Direct Stream</span> </p> </div> <div class="media-progress"><div class=""><div class="media-progress-track"></div> <div class="media-progress-pct" style="width: 85%;"></div> </div></div> </div> <div class="session-user pull-right"> <div class="user-poster img-circle loaded" style="background-image: url(&quot;blob:https%3A//app.plex.tv/a06a8a62-15d9-482d-8e77-cbd99edfe7ee&quot;);"></div> <div class="session-username media-heading secondary">kknopper</div> </div> <div class="media-title media-heading">The Peanuts Movie</div> <div class="media-subtitle-1 media-heading secondary">2015</div> </a>
+    </section> -->
 
 
 
-  <div class="console"></div>
-</body>
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="helperFunctions.js"></script>
-<script type="text/javascript" src="app.js"></script>
+    <div class="console"></div>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="helperFunctions.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+  </body>
 </html>
