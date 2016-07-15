@@ -8,34 +8,35 @@
     <img src="images/plex-white.png" alt="plex logo">
     <h1>Status Monitor</h1>
   </header>
-  <section id="login">
+  <form id="login">
     <h2>Sign in to plex:</h2>
     <label>Username:</label>
-    <input type="text" id="username">
+    <input type="text" id="username" placeholder="Username or Email">
     <label>Password:</label>
-    <input type="password" id="password">
+    <input type="password" id="password" placeholder="Password">
     <!-- <label>Server IP:</label>
     <input type="text" id="server-ip"> -->
-    <a class="plex-button" href="#">Launch</a>
-  </section>
+    <input type="submit" style="visibility: hidden;" />
+    <div class="plex-button" id="login-button">Launch</div>
+  </form>
 
   <section id="user-section">
   </section>
 
   <script id="active-users" type="text/x-handlebars-template">
     {{#each this}}
-    <div class="user-wrapper">
-      <div class="media-wrap">
+    <div class="media-wrapper clearfix">
+      <div class="media-content-wrap">
         <img src="{{mediaImg}}" class="media-image" alt="">
         <div class="media-duration-bar"></div>
         <div class="media-duration-bar-highlight" data-timeline="{{mediaTimeLeft}}" style='width: {{mediaTimeLeft}};' data-media-index="{{movieIndex}}"></div>
       </div>
 
-      <div class="movie-info">
+      <div class="media-info-wrap">
         <h4 class="movie-title">{{this.mediaTitle}}</h4>
-        <p class="movie-year">{{this.mediaYear}}</p>
+        <p class="media-year">{{this.mediaYear}}</p>
       </div>
-      <div class="user-info">
+      <div class="user-info-wrap">
         <p class="user-name">{{this.userName}}</p>
         {{#if userThumb}}
           <img class="user-image" src="{{userThumb}}" alt="">
@@ -44,6 +45,8 @@
     </div>
     {{/each}}
   </script>
+
+  <div class="plex-button" id="logout-button">Logout</div>
 
 <!--   <section>
     <a class="media-poster-container " href="#">

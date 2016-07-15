@@ -146,6 +146,9 @@ function getPlexIp(token) {
 }
 
 function plexQuery(ip, token) {
+  if (settings.loggedIn == false) {
+    return;
+  }
   console.log("PLEX QUERY START", ip, token)
   console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
   console.log("SETTINGS: ", settings)
@@ -168,15 +171,12 @@ function plexQuery(ip, token) {
 
     setHandleBarData(ip, token, data)
     console.log('LoggedIn: ', settings.loggedIn)
-    // while (settings.loggedIn) {
       console.log("PING SERVER EVERY 30 seconds")
       console.log("SERVER INTERVAL:", serverInterval);
       setTimeout(function() {
         plexQuery(ip, token);
       }, serverInterval);
       // console.log("AFTER TIMEOUT")
-
-    // }
 
     // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
   })
@@ -190,7 +190,7 @@ function plexQuery(ip, token) {
 }
 
 function setHandleBarData(url, token, data) {
-  var userInfo = [];
+  var mediaInfo = [];
   console.log(data._children);
   // console.log(data.MediaContainer['@attributes'].size);
   if (data._children.size == 0) {
@@ -233,28 +233,30 @@ function setHandleBarData(url, token, data) {
         console.log(data._children[i]._children)
         for (var j=0; j<data._children[i]._children.length; j++) {
           console.log(data._children[i]._children[j]._elementType)
+          if (data._children[i]._children[j]._elementType == 'User') {
+            mediaInfo.push({
+              mediaTitle: data._children[i].title,
+              userThumb: data._children[i]._children[j].thumb,
+              userName: data._children[i]._children[j].title,
+              mediaImg: url + data._children[i].art + '?X-Plex-Token=' + token,
+              mediaYear: data._children[i].year,
+              mediaDuration: mediaDuration,
+              mediaOffset: mediaOffset,
+              mediaTimeLeft: mediaPercentWatched + '%'
+            });
+            break;
+          }
         }
         // data._children[i]._children = {data._children[i]._children}
       }
-      console.log(data._children[i]._children)
-
-      userInfo.push({
-        mediaTitle: data._children[i].title,
-        userThumb: data._children[i]._children[1].thumb,
-        userName: data._children[i]._children[1].title,
-        mediaImg: url + data._children[i].art + '?X-Plex-Token=' + token,
-        mediaYear: data._children[i].year,
-        mediaDuration: mediaDuration,
-        mediaOffset: mediaOffset,
-        mediaTimeLeft: mediaPercentWatched + '%'
-      })
 
     }
     var templateSource = $("#active-users").html();
     var template = Handlebars.compile(templateSource);
-    var html = template(userInfo);
+    var html = template(mediaInfo);
     // console.log("HTMLLL",html, "template source", templateSource, template)
     $('#user-section').html(html)
+    $('#logout-button').show();
     settings.isActive = true
     settings.userCount = String(i)
     ipcRenderer.send('asynchronous-message', settings);
@@ -263,7 +265,8 @@ function setHandleBarData(url, token, data) {
 
 
 //RUN ON CLICK
-$('.plex-button').click(function() {
+
+$('#login').submit(function(e) {
   settings.username = $un.val()
   settings.password = $pass.val()
   // settings.serverIp = $serverIp.val()
@@ -284,4 +287,22 @@ $('.plex-button').click(function() {
     console.log("Login Start");
     getPlexToken(settings);
   }, 5000);
+  e.preventDefault();
+});
+
+$('#login-button').click(function() {
+  $('#login').submit();
+});
+
+
+$('#logout-button').click(function() {
+  console.log('logout');
+  $('#user-section').html('');
+  $(this).hide();
+  $('#login').show();
+  settings.loggedIn = false;
+  settings.isActive = false;
+  settings.userCount = 0;
+  ipcRenderer.send('asynchronous-message', settings);
+
 });

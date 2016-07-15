@@ -1,6 +1,6 @@
 var menubar = require('menubar')
 require('electron-debug')({
-    showDevTools: true
+    showDevTools: false
 });
 var handlebars = require('handlebars');
 // var jsdom = require("jsdom");
@@ -13,8 +13,8 @@ var handlebars = require('handlebars');
 var opts = {
   width: 500,
   height: 500,
-  transparent: true,
-  y: 27,
+  transparent: false,
+  y: 35,
   tooltip: 'Plex Activity Monitor'
 }
 
