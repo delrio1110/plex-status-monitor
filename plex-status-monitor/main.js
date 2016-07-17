@@ -2,27 +2,21 @@ var menubar = require('menubar')
 require('electron-debug')({
     showDevTools: false
 });
-var handlebars = require('handlebars');
-// var jsdom = require("jsdom");
-// var $ = require("jquery")
-// var cheerio = require('cheerio');
-// In main process.
-
-
 
 var opts = {
   width: 500,
-  height: 500,
+  height: 700,
   transparent: false,
   y: 35,
-  tooltip: 'Plex Activity Monitor'
+  tooltip: 'Plex Status Monitor',
+  icon: 'IconTemplate.png'
 }
 
 var mb = menubar(opts)
 
 mb.on('ready', function ready () {
   console.log('app is ready')
-  mb.setOption('icon', 'IconActive.png');
+  // mb.setOption('icon', 'IconActive.png');
   mb.tray.setPressedImage('IconPressed.png')
 })
 

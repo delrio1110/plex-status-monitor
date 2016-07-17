@@ -1,6 +1,7 @@
 var Handlebars = require('handlebars');
 window.jQuery = window.$ = require('jquery');
 var storage = require('electron-json-storage');
+require('parsleyjs');
 // var menubar = require('menubar')
 // var mb = menubar()
 var ipcRenderer = require('electron').ipcRenderer;
@@ -14,8 +15,11 @@ ipcRenderer.on('asynchronous-reply', function(event, arg) {
 //GET PlexQuery ajax call working
 
 
-var $un = $('#username')
-var $pass = $('#password')
+var $userName = $('#username'),
+$password = $('#password'),
+$logInForm = $('#login'),
+$logInButton = $('#login-button'),
+$logOutButton = $('#logout-button');
 // var $serverIp = $('#server-ip')
 var token
 var serverInterval = 1000 * 30; // 30s between server ping
@@ -80,9 +84,11 @@ function getPlexToken(userSettings) {
     .done(function(data) {
       console.log("PLEX TOKEN ACQUIRED.", data)
       token = data.user.authentication_token;
-      settings.plexToken = token;
+      userSettings.plexToken = token;
       console.log("PLEX TOKEN: ", token);
-      settings.loggedIn = true;
+      userSettings.loggedIn = true;
+      $userName.val('')
+      $password.val('')
 
       // plexQuery(url, token)
       $('#login').hide()
@@ -146,8 +152,13 @@ function getPlexIp(token) {
 }
 
 function plexQuery(ip, token) {
-  if (settings.loggedIn == false) {
-    return;
+  var plexQueryTimeout
+
+  console.log("Logged in? ", settings.loggedIn)
+  if (!settings.loggedIn) {
+    console.log("BREAKOUT")
+    clearTimeout(plexQueryTimeout);
+    return false;
   }
   console.log("PLEX QUERY START", ip, token)
   console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
@@ -173,7 +184,8 @@ function plexQuery(ip, token) {
     console.log('LoggedIn: ', settings.loggedIn)
       console.log("PING SERVER EVERY 30 seconds")
       console.log("SERVER INTERVAL:", serverInterval);
-      setTimeout(function() {
+
+      plexQueryTimeout = setTimeout(function() {
         plexQuery(ip, token);
       }, serverInterval);
       // console.log("AFTER TIMEOUT")
@@ -193,8 +205,9 @@ function setHandleBarData(url, token, data) {
   var mediaInfo = [];
   console.log(data._children);
   // console.log(data.MediaContainer['@attributes'].size);
-  if (data._children.size == 0) {
-    $('#user-section').html('<h1>No Active Users :)</h1>')
+  if (data._children.length < 1) {
+    $('#user-section').html('<h1>No Active Users</h1><i class="icomoon icon-hipster"></i>')
+    $logOutButton.show();
     settings.isActive = false;
     settings.userCount = '0';
     ipcRenderer.send('asynchronous-message', settings);
@@ -256,7 +269,7 @@ function setHandleBarData(url, token, data) {
     var html = template(mediaInfo);
     // console.log("HTMLLL",html, "template source", templateSource, template)
     $('#user-section').html(html)
-    $('#logout-button').show();
+    $logOutButton.show();
     settings.isActive = true
     settings.userCount = String(i)
     ipcRenderer.send('asynchronous-message', settings);
@@ -264,45 +277,88 @@ function setHandleBarData(url, token, data) {
 }
 
 
-//RUN ON CLICK
-
-$('#login').submit(function(e) {
-  settings.username = $un.val()
-  settings.password = $pass.val()
+function logIn() {
+  settings.username = $userName.val()
+  settings.password = $password.val()
   // settings.serverIp = $serverIp.val()
-
   storage.set('username', settings.username)
   storage.set('password', settings.password)
   // storage.set('server', settings.serverIp)
-
-  storage.has('username', function(error, hasKey) {
-    if (error) throw error;
-
-    if (hasKey) {
-      console.log('There is data stored as `username`');
-    }
-  });
+  // storage.has('username', function(error, hasKey) {
+  //   if (error) throw error;
+  //   if (hasKey) {
+  //     console.log('There is data stored as `username`');
+  //   }
+  // });
 
   setTimeout(function() {
     console.log("Login Start");
     getPlexToken(settings);
   }, 5000);
-  e.preventDefault();
-});
+}
 
-$('#login-button').click(function() {
-  $('#login').submit();
-});
-
-
-$('#logout-button').click(function() {
+function logOut() {
   console.log('logout');
   $('#user-section').html('');
-  $(this).hide();
-  $('#login').show();
+  $logInForm.show();
+  $logOutButton.hide();
   settings.loggedIn = false;
+  console.log("Logged in? ", settings.loggedIn);
   settings.isActive = false;
   settings.userCount = 0;
   ipcRenderer.send('asynchronous-message', settings);
+}
 
+//RUN ON CLICK
+
+// $('#login').parsley();
+
+$logInForm.submit(function(e) {
+  $('.icomoon').removeClass('icomoon-focus');
+  $logInForm.parsley().on('form:submit', function() {
+    logIn();
+    e.preventDefault();
+  });
 });
+
+$logInButton.click(function() {
+  $logInForm.submit();
+});
+
+$logOutButton.click(function() {
+  logOut();
+});
+
+$('input').focus(function() {
+  if(!$(this).hasClass('icomoon-error')) {
+    $(this).prev('.icomoon').addClass('icomoon-focus');
+  }
+})
+
+$('input').focusout(function() {
+  $(this).prev('.icomoon').removeClass('icomoon-focus');
+})
+
+$password.parsley().on('field:error', function() {
+  console.log('error')
+  $password.prev('.icomoon').removeClass('icon-key').addClass('icon-x2 icomoon-error')
+  $password.next('.parsley-errors-list').show()
+})
+
+$password.parsley().on('field:success', function() {
+  console.log('pass success')
+  $password.prev('.icomoon').removeClass('icomoon-error icon-x2').addClass('icon-key')
+  $password.next('.parsley-errors-list').hide()
+})
+
+$userName.parsley().on('field:error', function() {
+  console.log('error')
+  $userName.prev('.icomoon').removeClass('icon-mail-envelope-closed').addClass('icon-x2 icomoon-error')
+  $userName.next('.parsley-errors-list').show()
+})
+
+$userName.parsley().on('field:success', function() {
+  console.log('username sucssess')
+  $userName.prev('.icomoon').removeClass('icomoon-error icon-x2').addClass('icon-mail-envelope-closed')
+  $userName.next('.parsley-errors-list').hide()
+})

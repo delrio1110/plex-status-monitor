@@ -1,23 +1,30 @@
-<html>
+<!DOCTYPE html>
   <head>
     <title>Status Monitor</title>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <link rel="stylesheet" href="css/animate.min.css">
   </head>
   <body>
     <header>
       <img src="images/plex-white.png" alt="plex logo">
       <h1>Status Monitor</h1>
     </header>
-    <form id="login">
-      <h2>Sign in to plex:</h2>
-      <label>Username:</label>
-      <input type="text" id="username" placeholder="Username or Email">
-      <label>Password:</label>
-      <input type="password" id="password" placeholder="Password">
-      <!-- <label>Server IP:</label>
-      <input type="text" id="server-ip"> -->
-      <input type="submit" style="visibility: hidden;" />
-      <div class="plex-button" id="login-button">Launch</div>
+    <form id="login" data-parsley-validate>
+      <h2>Sign In</h2>
+
+      <div class="input-wrap">
+        <div class="input-field">
+          <i class="icomoon icon-mail-envelope-closed"></i>
+          <input type="text" id="username" placeholder="Username or Email" required data-parsley-error-message="Username or Email required">
+        </div>
+        <div class="input-field">
+          <i class="icomoon icon-key"></i>
+          <input type="password" id="password" placeholder="Password" required data-parsley-error-message="Password is required">
+        </div>
+      </div>
+
+      <button class="plex-button" type="submit" id="login-button">Sign In</button>
     </form>
 
     <section id="user-section">
@@ -71,7 +78,7 @@
 
     <div class="console"></div>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript" src="helperFunctions.js"></script>
-    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="js/helperFunctions.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
   </body>
 </html>

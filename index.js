@@ -44,7 +44,7 @@ module.exports = function create (opts) {
     if (app.dock && !opts['show-dock-icon']) app.dock.hide()
 
     var iconPath = opts.icon || path.join(opts.dir, 'IconTemplate.png')
-    if (!fs.existsSync(iconPath)) iconPath = path.join(__dirname, 'example', 'IconTemplate.png') // default cat icon
+    if (!fs.existsSync(iconPath)) iconPath = path.join(__dirname, 'plex-status-monitor', 'IconTemplate.png') // default cat icon
 
     var cachedBounds // cachedBounds are needed for double-clicked event
     var defaultClickEvent = opts['show-on-right-click'] ? 'right-click' : 'click'
