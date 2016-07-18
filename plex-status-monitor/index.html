@@ -10,22 +10,28 @@
       <img src="images/plex-white.png" alt="plex logo">
       <h1>Status Monitor</h1>
     </header>
-    <form id="login" data-parsley-validate>
-      <h2>Sign In</h2>
+    <div class="form-wrapper">
+      <div class="form-error"></div>
+      <form id="login">
+        <h2>Sign In</h2>
 
-      <div class="input-wrap">
-        <div class="input-field">
-          <i class="icomoon icon-mail-envelope-closed"></i>
-          <input type="text" id="username" placeholder="Username or Email" required data-parsley-error-message="Username or Email required">
+        <div class="input-wrap">
+          <div class="input-field">
+            <i class="icomoon icon-mail-envelope-closed"></i>
+            <input type="text" id="username" placeholder="Username or Email" required data-parsley-error-message="Username or Email required">
+          </div>
+          <div class="input-field">
+            <i class="icomoon icon-key"></i>
+            <input type="password" id="password" placeholder="Password" required data-parsley-error-message="Password is required">
+          </div>
         </div>
-        <div class="input-field">
-          <i class="icomoon icon-key"></i>
-          <input type="password" id="password" placeholder="Password" required data-parsley-error-message="Password is required">
-        </div>
-      </div>
 
-      <button class="plex-button" type="submit" id="login-button">Sign In</button>
-    </form>
+        <button class="plex-button" type="submit" id="login-button">
+          <span>Sign In</span>
+          <div class="loader"></div>
+        </button>
+      </form>
+    </div>
 
     <section id="user-section">
     </section>

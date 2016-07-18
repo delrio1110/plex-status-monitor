@@ -19,6 +19,9 @@ var $userName = $('#username'),
 $password = $('#password'),
 $logInForm = $('#login'),
 $logInButton = $('#login-button'),
+$logInButtonText = $('#login-button span'),
+$loader = $('.loader'),
+$formError = $('.form-error'),
 $logOutButton = $('#logout-button');
 // var $serverIp = $('#server-ip')
 var token
@@ -89,17 +92,26 @@ function getPlexToken(userSettings) {
       userSettings.loggedIn = true;
       $userName.val('')
       $password.val('')
+      $formError.html('').hide();
+
 
       // plexQuery(url, token)
       $('#login').hide()
 
       getPlexIp(token);
     })
-    .fail(function(data) {
-      console.log("FAIL!!!!", data)
+    .fail(function(data, textStatus, errorThrown) {
+      var responseText = jQuery.parseJSON(data.responseText);
+
+      if(data.status > 399) {
+        $formError.show().html(responseText.error);
+      }
+      console.log("Login Fail!!!!", data)
     })
     .always(function() {
-      console.log("Get Plex Token Complete");
+      console.log("Login Ajax finish");
+      $loader.hide()
+      $logInButtonText.show()
     });
 }
 
@@ -206,7 +218,7 @@ function setHandleBarData(url, token, data) {
   console.log(data._children);
   // console.log(data.MediaContainer['@attributes'].size);
   if (data._children.length < 1) {
-    $('#user-section').html('<h1>No Active Users</h1><i class="icomoon icon-hipster"></i>')
+    $('#user-section').html('<i class="icomoon-hipster icon-hipster"></i><h3>No Active Users</h3>')
     $logOutButton.show();
     settings.isActive = false;
     settings.userCount = '0';
@@ -283,6 +295,8 @@ function logIn() {
   // settings.serverIp = $serverIp.val()
   storage.set('username', settings.username)
   storage.set('password', settings.password)
+  $logInButtonText.hide()
+  $loader.show()
   // storage.set('server', settings.serverIp)
   // storage.has('username', function(error, hasKey) {
   //   if (error) throw error;
@@ -291,10 +305,10 @@ function logIn() {
   //   }
   // });
 
-  setTimeout(function() {
+  // setTimeout(function() {
     console.log("Login Start");
     getPlexToken(settings);
-  }, 5000);
+  // }, 5000);
 }
 
 function logOut() {
@@ -311,14 +325,14 @@ function logOut() {
 
 //RUN ON CLICK
 
-// $('#login').parsley();
+$('#login').parsley({errorsWrapper: '<ul class="parsley-errors-list animated pulse"></ul>'});
 
 $logInForm.submit(function(e) {
-  $('.icomoon').removeClass('icomoon-focus');
-  $logInForm.parsley().on('form:submit', function() {
+  e.preventDefault();
+  if($logInForm.parsley().isValid()) {
+    console.log('FORM SUBMIT');
     logIn();
-    e.preventDefault();
-  });
+  }
 });
 
 $logInButton.click(function() {

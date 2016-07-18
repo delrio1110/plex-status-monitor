@@ -6,10 +6,11 @@ require('electron-debug')({
 var opts = {
   width: 500,
   height: 700,
-  transparent: false,
+  transparent: true,
   y: 35,
   tooltip: 'Plex Status Monitor',
-  icon: 'IconTemplate.png'
+  icon: 'IconTemplate.png',
+  resizable: false
 }
 
 var mb = menubar(opts)
@@ -17,6 +18,7 @@ var mb = menubar(opts)
 mb.on('ready', function ready () {
   console.log('app is ready')
   // mb.setOption('icon', 'IconActive.png');
+  // mb.window.
   mb.tray.setPressedImage('IconPressed.png')
 })
 
