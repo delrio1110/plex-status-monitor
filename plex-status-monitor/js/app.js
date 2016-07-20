@@ -2,6 +2,10 @@ var Handlebars = require('handlebars');
 window.jQuery = window.$ = require('jquery');
 var storage = require('electron-json-storage');
 require('parsleyjs');
+
+//FOR GULP
+require('electron-connect').client.create()
+
 // var menubar = require('menubar')
 // var mb = menubar()
 var ipcRenderer = require('electron').ipcRenderer;
@@ -9,7 +13,6 @@ console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pon
 ipcRenderer.on('asynchronous-reply', function(event, arg) {
   console.log(arg); // prints "pong"
 });
-
 
 //TODO
 //GET PlexQuery ajax call working

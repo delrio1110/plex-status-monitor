@@ -48,7 +48,7 @@ gulp.task('watch', function() {
   gulp.watch(['src/js/app.js', 'index.html'], electron.reload);
 
   // gulp watch for stylus changes
-  gulp.watch('src/scss/**/*.scss', ['sass']);
+  gulp.watch('src/scss/**/*.scss', ['sass', electron.reload]);
 
 });
 
