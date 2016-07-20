@@ -1,3 +1,6 @@
+@import 'libs/animate';
+@import 'libs/icomoon';
+
 @font-face {
     font-family: Open Sans;
     src: url(../fonts/open-sans/OpenSans-Regular.ttf);
@@ -32,13 +35,13 @@ header {
   max-width: 200px;
   margin: 0 auto;
   padding-top: 10px;
-}
 
-header img {
-  width: 100%;
-  max-width: 150px;
-  margin: 15px auto;
-  display: block;
+  img {
+    width: 100%;
+    max-width: 150px;
+    margin: 15px auto;
+    display: block;
+  }
 }
 
 label {
@@ -86,22 +89,20 @@ input {
   color: #868C96;
   font-size: 1em;
   transition: all .3s ease-in;
-  -webkit-transition: all .3s ease-in;
-}
 
-input:active, input:focus, input:focus::-webkit-input-placeholder {
-  outline: none;
-  color: #FF8A00;
-}
+  &:active, &:focus, &:focus::-webkit-input-placeholder {
+    outline: none;
+    color: #FF8A00;
+  }
 
-input::-webkit-input-placeholder {
-   color: #868C96;
-   transition: all .3s ease-in;
-   -webkit-transition: all .3s ease-in;
-}
+  &::-webkit-input-placeholder {
+    color: #868C96;
+    transition: all .3s ease-in;
+  }
 
-input.parsley-error:focus::-webkit-input-placeholder {
-  color: #868C96;
+  .parsley-error:focus::-webkit-input-placeholder {
+    color: #868C96;
+  }
 }
 
 .icomoon {
@@ -111,30 +112,29 @@ input.parsley-error:focus::-webkit-input-placeholder {
   border: 2px solid #868C96;
   padding: 3px;
   transition: all .3s ease-in;
-  -webkit-transition: all .3s ease-in;
   width: 16px;
   height: 16px;
   font-size: 1em;
   text-align: center;
   margin-left: 5px;
-}
 
-.icomoon-focus {
-  color: #FF8A00;
-  border: 2px solid #FF8A00;
-}
+  &-focus {
+    color: #FF8A00;
+    border: 2px solid #FF8A00;
+  }
 
-.icomoon-hipster {
-  color: #E5A00D;
-  font-size: 1.75em;
-  text-align: center;
-  display: block;
-  margin: 50px auto 0;
-}
+  &-hipster {
+    color: #E5A00D;
+    font-size: 1.75em;
+    text-align: center;
+    display: block;
+    margin: 50px auto 0;
+  }
 
-.icomoon-error, .icomoon-error.icomoon-focus {
-  color: #B94A48;
-  border: 2px solid #B94A48;
+  &-error, &-error.icomoon-focus {
+    color: #B94A48;
+    border: 2px solid #B94A48;
+  }
 }
 
 .input-wrap {
@@ -149,10 +149,20 @@ input.parsley-error:focus::-webkit-input-placeholder {
   max-width: 300px;
   margin: 0 auto;
   padding: 10px 10px;
+
+  &:first-child {
+    border-bottom: 2px solid #F2F3F4;
+  }
 }
 
-.input-field:first-child {
-  border-bottom: 2px solid #F2F3F4;
+button.plex-button {
+  /*padding: 14px 40px;*/
+  /*text-transform: uppercase;*/
+  /*background: #e5a00d;*/
+  height: 45px;
+  width: 100%;
+  outline: 0;
+  border: none;
 }
 
 .plex-button {
@@ -170,25 +180,14 @@ input.parsley-error:focus::-webkit-input-placeholder {
   font-size: 1em;
   transition: all .3s ease-in;
   max-width: 300px;
-}
 
-button.plex-button {
-    /*padding: 14px 40px;*/
-    /*text-transform: uppercase;*/
-    /*background: #e5a00d;*/
-    height: 45px;
-    width: 100%;
-    outline: 0;
-    border: none;
-}
+  &:hover {
+    background-color: #f9BE03;
+  }
 
-.plex-button:hover {
-  /*linear-gradient(to bottom, #f2b63a 0%, #f58e39 100%);*/
-  background-color: #f9BE03;
-}
-
-.plex-button:active {
-  transform: scale(.98);
+  &:active {
+    transform: scale(.98);
+  }
 }
 
 #logout-button {
@@ -242,7 +241,6 @@ button.plex-button {
   width: 100%;
   background-color: #CC7B19;
   z-index: 1;
-  -webkit-transition: width 1s;
   transition: width 1s;
 }
 
@@ -272,36 +270,29 @@ button.plex-button {
   border-right: 1.1em solid rgba(255,255,255,.2);
   border-bottom: 1.1em solid rgba(255,255,255,.2);
   border-left: 1.1em solid #fff;
-   -webkit-transform: translateZ(0);
-  /*-ms-transform: translateZ(0);*/
-   transform: translateZ(0);
-  -webkit-animation: spin 1.1s infinite linear;
+  transform: translateZ(0);
   animation: spin 1.1s infinite linear;
-}
 
-.loader, .loader:after {
-  border-radius: 50%;
-  width: 10em;
-  height: 10em;
+  &, &:after {
+    border-radius: 50%;
+    width: 10em;
+    height: 10em;
+  }
 }
 
 @-webkit-keyframes spin {
   0% {
-    -webkit-transform: rotate(0);
     transform: rotate(0)
   }
   100% {
-    -webkit-transform: rotate(360deg);
     transform: rotate(360deg)
   }
 }
 @keyframes spin {
     0% {
-      -webkit-transform: rotate(0);
       transform: rotate(0)
     }
     100% {
-      -webkit-transform: rotate(360deg);
       transform: rotate(360deg)
     }
 }
@@ -311,7 +302,6 @@ button.plex-button {
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-
   border-bottom: 5px solid #323232;
 }
 
@@ -367,21 +357,19 @@ textarea.parsley-error {
   color: #B94A48;
   background-color: #F2DEDE;
   display: block;
-
   transition: all .3s ease-in;
-  -webkit-transition: all .3s ease-in;
-}
 
-.parsley-errors-list:after {
-  content: "";
-  width: 0;
-  height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-bottom: 7px solid #F2DEDE;
-  position: absolute;
-  top: -7px;
-  left: 10px;
+  &:after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #F2DEDE;
+    position: absolute;
+    top: -7px;
+    left: 10px;
+  }
 }
 
 .form-error {

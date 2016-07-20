@@ -8,11 +8,20 @@
     "menubar": "*"
   },
   "devDependencies": {
+    "browser-sync": "^2.13.0",
+    "electron-connect": "^0.4.2",
     "electron-packager": "^5.1.0",
     "electron-prebuilt": "^0.36.0",
+    "es6-promise": "^3.2.1",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-util": "^3.0.7",
     "handlebars": "^4.0.5",
     "jquery": "^2.2.2",
-    "parsleyjs": "^2.4.3"
+    "parsleyjs": "^2.4.3",
+    "react": "^15.2.1"
   },
   "main": "main.js",
   "scripts": {

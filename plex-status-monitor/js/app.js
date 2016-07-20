@@ -335,10 +335,6 @@ $logInForm.submit(function(e) {
   }
 });
 
-$logInButton.click(function() {
-  $logInForm.submit();
-});
-
 $logOutButton.click(function() {
   logOut();
 });
