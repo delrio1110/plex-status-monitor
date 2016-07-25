@@ -253,35 +253,50 @@ function setHandleBarData(url, token, data) {
       var mediaDuration = msToTime(data._children[i].duration)
       var mediaOffset = msToTime(data._children[i].viewOffset)
       var mediaPercentWatched = ((data._children[i].viewOffset) / (data._children[i].duration) * 100)
+      var mediaInfoData = {};
 
       console.log("MOVIE DURATION: ", mediaDuration)
       console.log("MOVIE WATCHED: ", mediaOffset)
       console.log(data._children[i]._children)
-      if (Array.isArray(data._children[i]._children)) {
+      // if (Array.isArray(data._children[i]._children)) {
         console.log(data._children[i]._children)
         for (var j=0; j<data._children[i]._children.length; j++) {
-          console.log(data._children[i]._children[j]._elementType)
-          if (data._children[i]._children[j]._elementType == 'User') {
-            mediaInfo.push({
-              mediaTitle: data._children[i].title,
-              userThumb: data._children[i]._children[j].thumb,
-              userName: data._children[i]._children[j].title,
-              mediaImg: url + data._children[i].art + '?X-Plex-Token=' + token,
-              mediaYear: data._children[i].year,
-              mediaDuration: mediaDuration,
-              mediaOffset: mediaOffset,
-              mediaTimeLeft: mediaPercentWatched + '%'
-            });
-            break;
-          }
-        }
-        // data._children[i]._children = {data._children[i]._children}
-      }
 
-    }
+          if (data._children[i]._children[j]._elementType == 'User') {
+              mediaInfoData.mediaType = data._children[i]._elementType
+              mediaInfoData.userThumb = data._children[i]._children[j].thumb;
+              mediaInfoData.userName = data._children[i]._children[j].title;
+              mediaInfoData.mediaTitle = data._children[i].title;
+              mediaInfoData.mediaAlbulmTitle = data._children[i].parentTitle;
+              mediaInfoData.mediaAlbulmArtist = data._children[i].grandparentTitle;
+              mediaInfoData.mediaImg = url + data._children[i].art + '?X-Plex-Token=' + token;
+              mediaInfoData.mediaYear = data._children[i].year;
+              mediaInfoData.mediaDuration = mediaDuration;
+              mediaInfoData.mediaOffset = mediaOffset;
+              mediaInfoData.mediaTimeLeft = mediaPercentWatched + '%';
+
+              if(data._children[i]._elementType == 'Track') {
+                mediaInfoData.mediaTypeIsTrack = true;
+              }
+          }
+
+          if (data._children[i]._children[j]._elementType == 'Player') {
+            mediaInfoData.playerTitle = data._children[i]._children[j].title;
+            mediaInfoData.playerState = data._children[i]._children[j].state;
+          }
+
+          if (j == data._children[i]._children.length-1) {
+            mediaInfo.push(mediaInfoData)
+          }
+        } //end inner loop
+        // data._children[i]._children = {data._children[i]._children}
+      // }
+      // mediaInfo.push(mediaInfoData);
+    }// end outer loop
     var templateSource = $("#active-users").html();
     var template = Handlebars.compile(templateSource);
     var html = template(mediaInfo);
+    console.log('======MEDIA INFO=====', mediaInfo)
     // console.log("HTMLLL",html, "template source", templateSource, template)
     $('#user-section').html(html)
     $logOutButton.show();

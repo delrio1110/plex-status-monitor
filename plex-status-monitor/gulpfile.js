@@ -9,12 +9,6 @@ var electron = require('electron-connect').server.create();
 gulp.task('start', function () {
   // Start browser process
   electron.start();
-
-  // Restart browser process
-  gulp.watch('main.js', electron.restart);
-
-  // Reload renderer process
-  gulp.watch(['src/js/app.js', 'index.html'], electron.reload);
 });
 
 gulp.task('sass', function () {
@@ -23,33 +17,32 @@ gulp.task('sass', function () {
   .pipe(sass().on('error', sass.logError))
   .pipe(sourcemaps.write())
   .pipe(autoprefixer())
-  .pipe(gulp.dest('build/css'))
+  .pipe(gulp.dest('build/css'));
+  electron.reload;
   // .pipe(reload({stream:true}))
-
 });
 
-// gulp.task('sass:watch', function () {
-//   gulp.watch('.src/scss/**/*.scss', ['sass']);
-// });
-
-gulp.task('copyfonts',function() {
+gulp.task('copyfonts', function() {
   // move over fonts
-  gulp.src('src/fonts/**/*.{txt,ttf,woff,eof,eot,svg}')
+  gulp.src('src/fonts/**/*.{txt,ttf,woff,eof,eot,svg,js}')
     .pipe(gulp.dest('build/fonts'))
 });
 
-gulp.task('default', ['sass', 'copyfonts', 'start']);
+gulp.task('copyjs', function() {
+  // move over js
+  gulp.src('src/js/**/*.js')
+    .pipe(gulp.dest('build/js'))
+});
+
+gulp.task('default', ['sass', 'copyjs', 'copyfonts', 'start']);
 
 gulp.task('watch', function() {
   // Restart browser process
-  gulp.watch('main.js', electron.restart);
-
+  gulp.watch('main.js', electron.reload);
   // Reload renderer process
-  gulp.watch(['src/js/app.js', 'index.html'], electron.reload);
-
+  gulp.watch(['src/js/**/*.js'], ['copyjs', electron.reload]);
   // gulp watch for stylus changes
   gulp.watch('src/scss/**/*.scss', ['sass', electron.reload]);
-
 });
 
 gulp.task('dev', ['default', 'watch']);
