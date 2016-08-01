@@ -4,11 +4,14 @@
     <link rel="stylesheet" href="build/css/main.css">
   </head>
   <body>
-    <header>
-      <img src="images/plex-white.png" alt="plex logo">
-      <h1>Status Monitor</h1>
-    </header>
-    <div class="form-wrapper">
+
+    <div class='main'>
+      <!-- <header>
+        <img src="images/plex-white.png" alt="plex logo">
+        <h1>Status Monitor</h1>
+      </header> -->
+    </div>
+    <!-- <div class="form-wrapper">
       <div class="form-error"></div>
       <form id="login">
         <h2>Sign In</h2>
@@ -29,7 +32,7 @@
           <div class="loader"></div>
         </button>
       </form>
-    </div>
+    </div> -->
 
     <section id="user-section">
     </section>
@@ -48,9 +51,15 @@
             <h3 class="media-artist">{{mediaAlbulmArtist}}</h3>
             <h4 class="media-albulm">{{mediaAlbulmTitle}}</h4>
             <h4 class="media-title">{{mediaTitle}}</h4>
+            <p>Completion Time:<br>{{mediaCompletion}}</p>
+            <p>{{playerTitle}}</p>
+            <p>{{playerState}}</p>
           {{else}}
             <h3 class="media-title">{{mediaTitle}}</h3>
             <p class="media-year">{{mediaYear}}</p>
+            <p>Completion Time:<br>{{mediaCompletion}}</p>
+            <p>{{playerTitle}}</p>
+            <p>{{playerState}}</p>
           {{/if}}
         </div>
         <div class="user-info-wrap">
@@ -88,8 +97,8 @@
 
     <div class="console"></div>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript" src="build/js/helperFunctions.js"></script>
-    <script type="text/javascript" src="build/js/app.js"></script>
+    <script type="text/javascript" src="build/js/main.js"></script>
+    <!-- <script type="text/javascript" src="build/js/app.js"></script> -->
     <!-- <script>require('electron-connect').client.create()</script> -->
 
   </body>

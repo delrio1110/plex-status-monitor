@@ -1,4 +1,6 @@
 var Handlebars = require('handlebars');
+var React = require('react');
+var ReactDOM = require('react-dom');
 window.jQuery = window.$ = require('jquery');
 var storage = require('electron-json-storage');
 require('parsleyjs');
@@ -14,9 +16,62 @@ ipcRenderer.on('asynchronous-reply', function(event, arg) {
   console.log(arg); // prints "pong"
 });
 
-//TODO
-//GET PlexQuery ajax call working
+var App = React.createClass({
 
+  render : function() {
+    return (
+      <div className='app'>
+        <Header/>
+        <LoginForm/>
+      </div>
+    )
+  }
+});
+
+var Header = React.createClass({
+
+  render: function() {
+    return (
+      <header>
+        <img src="images/plex-white.png" alt="plex logo" />
+        <h1>Status Monitor</h1>
+      </header>
+    )
+  }
+});
+
+var LoginForm = React.createClass({
+
+  render: function() {
+    return (
+      <div className="form-wrapper">
+        <div className="form-error"></div>
+        <form id="login">
+          <h2>Sign In</h2>
+
+          <div className="input-wrap">
+            <div className="input-field">
+              <i className="icomoon icon-mail-envelope-closed"></i>
+              <input type="text" id="username" placeholder="Username or Email" required data-parsley-error-message="Username or Email required" />
+            </div>
+            <div className="input-field">
+              <i className="icomoon icon-key"></i>
+              <input type="password" id="password" placeholder="Password" required data-parsley-error-message="Password is required" />
+            </div>
+          </div>
+
+          <button className="plex-button" type="submit" id="login-button">
+            <span>Sign In</span>
+            <div className="loader"></div>
+          </button>
+        </form>
+      </div>
+    )
+  }
+
+});
+
+ReactDOM.render(<App/>, document.querySelector('.main'));
 
 var $userName = $('#username'),
 $password = $('#password'),
@@ -134,14 +189,14 @@ function getPlexIp(token) {
         jsonData.MediaContainer.Device = [jsonData.MediaContainer.Device];
       }
 
-      for ( i=0; i < jsonData.MediaContainer.Device.length; i++ ) {
+      for (var i=0; i < jsonData.MediaContainer.Device.length; i++ ) {
         if (jsonData.MediaContainer.Device[i]['@attributes'].accessToken == token) {
           //Set Connection data to an array in case user has more than 1 connection objects
           if (!Array.isArray(jsonData.MediaContainer.Device[i].Connection)) {
             jsonData.MediaContainer.Device[i].Connection = [jsonData.MediaContainer.Device[i].Connection];
           }
 
-          for ( j=0; j < jsonData.MediaContainer.Device[i].Connection.length; j++ ) {
+          for ( var j=0; j < jsonData.MediaContainer.Device[i].Connection.length; j++ ) {
             // console.log(jsonData.MediaContainer.Device[i].Connection[j]);
             // console.log(jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local);
 
@@ -250,10 +305,18 @@ function setHandleBarData(url, token, data) {
     //   data.MediaContainer.Video = [data.MediaContainer.Video];
     // }
     for (var i=0; i<data._children.length; i++) {
-      var mediaDuration = msToTime(data._children[i].duration)
-      var mediaOffset = msToTime(data._children[i].viewOffset)
+      var mediaInfoData = {}
+
+      var mediaDurationinMs = data._children[i].duration
+      var mediaOffsetinMs = data._children[i].viewOffset
+      var mediaDuration = msToTime(mediaDurationinMs)
+      var mediaOffset = msToTime(mediaOffsetinMs)
+
       var mediaPercentWatched = ((data._children[i].viewOffset) / (data._children[i].duration) * 100)
-      var mediaInfoData = {};
+      var date = new Date()
+      var mediaCompletionEstimate = new Date(date.setMilliseconds(date.getMilliseconds() + (mediaDurationinMs - mediaOffsetinMs))).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
+
+
 
       console.log("MOVIE DURATION: ", mediaDuration)
       console.log("MOVIE WATCHED: ", mediaOffset)
@@ -273,8 +336,9 @@ function setHandleBarData(url, token, data) {
               mediaInfoData.mediaYear = data._children[i].year;
               mediaInfoData.mediaDuration = mediaDuration;
               mediaInfoData.mediaOffset = mediaOffset;
+              mediaInfoData.mediaCompletion = mediaCompletionEstimate;
               mediaInfoData.mediaTimeLeft = mediaPercentWatched + '%';
-
+//
               if(data._children[i]._elementType == 'Track') {
                 mediaInfoData.mediaTypeIsTrack = true;
               }

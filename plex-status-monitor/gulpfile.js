@@ -4,14 +4,15 @@ var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer')
 var electron = require('electron-connect').server.create();
-
+var concat = require("gulp-concat");
+var babel = require("gulp-babel");
 
 gulp.task('start', function () {
   // Start browser process
   electron.start();
 });
 
-gulp.task('sass', function () {
+gulp.task('scss', function () {
  return gulp.src('src/scss/**/*.scss')
   .pipe(sourcemaps.init())
   .pipe(sass().on('error', sass.logError))
@@ -28,21 +29,27 @@ gulp.task('copyfonts', function() {
     .pipe(gulp.dest('build/fonts'))
 });
 
-gulp.task('copyjs', function() {
-  // move over js
-  gulp.src('src/js/**/*.js')
-    .pipe(gulp.dest('build/js'))
+gulp.task('scripts', function() {
+
+  return gulp.src("src/js/**/*.js")
+    .pipe(sourcemaps.init())
+    .pipe(babel({
+      presets: ['react', 'es2015']
+    }))
+    .pipe(concat("main.js"))
+    .pipe(sourcemaps.write("."))
+    .pipe(gulp.dest("build/js"));
 });
 
-gulp.task('default', ['sass', 'copyjs', 'copyfonts', 'start']);
+gulp.task('default', ['scss', 'scripts', 'copyfonts', 'start']);
 
 gulp.task('watch', function() {
   // Restart browser process
   gulp.watch('main.js', electron.reload);
   // Reload renderer process
-  gulp.watch(['src/js/**/*.js'], ['copyjs', electron.reload]);
+  gulp.watch(['src/js/**/*.js'], ['scripts', electron.reload]);
   // gulp watch for stylus changes
-  gulp.watch('src/scss/**/*.scss', ['sass', electron.reload]);
+  gulp.watch('src/scss/**/*.scss', ['scss', electron.reload]);
 });
 
 gulp.task('dev', ['default', 'watch']);

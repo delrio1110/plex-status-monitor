@@ -105,6 +105,8 @@ input {
   &:active, &:focus, &:focus::-webkit-input-placeholder {
     outline: none;
     color: $plex-text;
+
+
   }
 
   &::-webkit-input-placeholder {
@@ -112,8 +114,8 @@ input {
     transition: all .3s ease-in;
   }
 
-  .parsley-error:focus::-webkit-input-placeholder {
-    color: $form-gray;
+  &.parsley-error:focus::-webkit-input-placeholder {
+    color: $fail-red;
   }
 }
 
@@ -147,10 +149,6 @@ input {
     color: $fail-red;
     border: 2px solid $fail-red;
   }
-}
-
-.icon-mail-envelope-closed {
-  transform: translateX(-5px);
 }
 
 .input-wrap {
