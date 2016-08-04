@@ -26,7 +26,8 @@
     "jquery": "^2.2.2",
     "parsleyjs": "^2.4.3",
     "react": "^15.3.0",
-    "react-dom": "^15.3.0"
+    "react-dom": "^15.3.0",
+    "react-router": "^2.6.1"
   },
   "main": "main.js",
   "scripts": {

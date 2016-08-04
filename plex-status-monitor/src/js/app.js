@@ -1,23 +1,30 @@
 var Handlebars = require('handlebars');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var ReactRouter = require('react-router');
+var Router = ReactRouter.Router;
+var Route = ReactRouter.Route;
+var History = ReactRouter.History;
 window.jQuery = window.$ = require('jquery');
 var storage = require('electron-json-storage');
 require('parsleyjs');
+require('electron-connect').client.create() //FOR GULP
 
-//FOR GULP
-require('electron-connect').client.create()
 
-// var menubar = require('menubar')
-// var mb = menubar()
 var ipcRenderer = require('electron').ipcRenderer;
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 ipcRenderer.on('asynchronous-reply', function(event, arg) {
   console.log(arg); // prints "pong"
 });
 
-var App = React.createClass({
+var settings = {
+  'isActive' : false,
+  'userCount': '0',
+  'plexServerPort': ':32400',
+  'loggedIn': false
+}
 
+var SignIn = React.createClass({
   render : function() {
     return (
       <div className='app'>
@@ -28,8 +35,65 @@ var App = React.createClass({
   }
 });
 
-var Header = React.createClass({
+var App = React.createClass({
+  getPlexToken: function(userSettings) {
+    $.ajax({
+        url: 'https://plex.tv/users/sign_in.json',
+        type: 'POST',
+        dataType: 'json',
+        beforeSend: function (json) {
+          json.setRequestHeader ("Authorization", "Basic " + btoa(userSettings.username + ":" + userSettings.password));
+        },
+        headers: {
+          'X-Plex-Platform': 'MacOSX',
+          'X-Plex-Platform-Version': '10.10.5',
+          'X-Plex-Provides': '1',
+          'X-Plex-Client-Identifier': 'Plex Server Status Monitor',
+          'X-Plex-Product': 'Plex Server Status Monitor',
+          'X-Plex-Version': '1.0',
+          'X-Plex-Device': 'Max OSX',
+          'X-Plex-Device-Name': 'Plex Web'
+        }
+      })
+      .done(function(data) {
+        console.log("PLEX TOKEN ACQUIRED.", data)
+        token = data.user.authentication_token;
+        userSettings.plexToken = token;
+        console.log("PLEX TOKEN: ", token);
+        userSettings.loggedIn = true;
+        $userName.val('')
+        $password.val('')
+        $formError.html('').hide();
 
+
+        // plexQuery(url, token)
+        $('#login').hide()
+
+        // getPlexIp(token);
+      })
+      .fail(function(data, textStatus, errorThrown) {
+        var responseText = jQuery.parseJSON(data.responseText);
+
+        if(data.status > 399) {
+          $formError.show().html(responseText.error);
+        }
+        console.log("Login Fail!!!!", data)
+      })
+      .always(function() {
+        console.log("Login Ajax finish");
+        $loader.hide()
+        $logInButtonText.show()
+      });
+  },
+  render: function() {
+    return (
+        <Header/>
+        <MediaContainer plexData = {}/>
+    )
+  }
+})
+
+var Header = React.createClass({
   render: function() {
     return (
       <header>
@@ -41,14 +105,30 @@ var Header = React.createClass({
 });
 
 var LoginForm = React.createClass({
-
+  mixins: [History],
+  login: function () {
+    settings.username = $userName.val()
+    settings.password = $password.val()
+    storage.set('username', settings.username)
+    storage.set('password', settings.password)
+    $logInButtonText.hide()
+    $loader.show()
+    console.log("Login Start");
+  },
+  signIn : function(e) {
+    e.preventDefault()
+    if(this.parsley().isValid()) {
+      console.log('FORM SUBMIT')
+      logIn();
+      this.history.pushState(null, '/app/')
+    }
+  },
   render: function() {
     return (
       <div className="form-wrapper">
         <div className="form-error"></div>
-        <form id="login">
+        <form id="login" onSubmit={this.signIn}>
           <h2>Sign In</h2>
-
           <div className="input-wrap">
             <div className="input-field">
               <i className="icomoon icon-mail-envelope-closed"></i>
@@ -59,7 +139,6 @@ var LoginForm = React.createClass({
               <input type="password" id="password" placeholder="Password" required data-parsley-error-message="Password is required" />
             </div>
           </div>
-
           <button className="plex-button" type="submit" id="login-button">
             <span>Sign In</span>
             <div className="loader"></div>
@@ -68,10 +147,55 @@ var LoginForm = React.createClass({
       </div>
     )
   }
-
 });
 
-ReactDOM.render(<App/>, document.querySelector('.main'));
+var MediaContainer = React.createClass({
+  render: function() {
+    return(
+      <div class="media-wrapper clearfix">
+        <div class="media-content-wrap">
+          <img src="{this.props.plexData.mediaImg}" class="media-image" alt="" />
+          <div class="media-duration-bar"></div>
+          <div class="media-duration-bar-highlight" data-timeline="{this.props.plexData.mediaTimeLeft}" style='width: {this.props.plexData.mediaTimeLeft};' data-media-index="{this.props.plexData.movieIndex}"></div>
+        </div>
+
+        <div class="media-info-wrap">
+          if ({this.props.plexData.mediaTypeIsTrack}) {
+            <h3 class="media-artist">{this.props.plexData.mediaAlbulmArtist}</h3>
+            <h4 class="media-albulm">{this.props.plexData.mediaAlbulmTitle}</h4>
+            <h4 class="media-title">{this.props.plexData.mediaTitle}</h4>
+            <p>Completion Time:<br />{this.props.plexData.mediaCompletion}</p>
+            <p>{this.props.plexData.playerTitle}</p>
+            <p>{this.props.plexData.playerState}</p>
+          } else {
+            <h3 class="media-title">{this.props.plexData.mediaTitle}</h3>
+            <p class="media-year">{this.props.plexData.mediaYear}</p>
+            <p>Completion Time:<br />{this.props.plexData.mediaCompletion}</p>
+            <p>{this.props.plexData.playerTitle}</p>
+            <p>{this.props.plexData.playerState}</p>
+          }
+        </div>
+        <div class="user-info-wrap">
+          <p class="user-name">{this.props.plexData.userName}</p>
+          if ({this.props.plexData.userThumb}) {
+            <img class="user-image" src="{this.props.plexData.userThumb}" alt="" />
+          }
+        </div>
+      </div>
+    )
+  }
+})
+
+
+
+var routes = (
+  <Router>
+    <Route path ='/' component={SignIn} />
+    <Route path ='/app/' component={App} />
+  </Router>
+)
+
+ReactDOM.render(routes, document.querySelector('.main'));
 
 var $userName = $('#username'),
 $password = $('#password'),
@@ -86,13 +210,6 @@ var token
 var serverInterval = 1000 * 30; // 30s between server ping
 var url = 'http://';
 // var ipAddressRef =  '71.84.24.194:32400'
-
-var settings = {
-  'isActive' : false,
-  'userCount': '0',
-  'plexServerPort': ':32400',
-  'loggedIn': false
-}
 
 // storage.has('username', function(error, hasKey) {
 //   if (error) throw error;
@@ -122,56 +239,6 @@ var settings = {
 //     }, 5000)
 //   }
 // });
-
-function getPlexToken(userSettings) {
-  $.ajax({
-      url: 'https://plex.tv/users/sign_in.json',
-      type: 'POST',
-      dataType: 'json',
-      beforeSend: function (json) {
-        json.setRequestHeader ("Authorization", "Basic " + btoa(userSettings.username + ":" + userSettings.password));
-      },
-      headers: {
-        'X-Plex-Platform': 'MacOSX',
-        'X-Plex-Platform-Version': '10.10.5',
-        'X-Plex-Provides': '1',
-        'X-Plex-Client-Identifier': 'Plex Server Status Monitor',
-        'X-Plex-Product': 'Plex Server Status Monitor',
-        'X-Plex-Version': '1.0',
-        'X-Plex-Device': 'Max OSX',
-        'X-Plex-Device-Name': 'Plex Web'
-      }
-    })
-    .done(function(data) {
-      console.log("PLEX TOKEN ACQUIRED.", data)
-      token = data.user.authentication_token;
-      userSettings.plexToken = token;
-      console.log("PLEX TOKEN: ", token);
-      userSettings.loggedIn = true;
-      $userName.val('')
-      $password.val('')
-      $formError.html('').hide();
-
-
-      // plexQuery(url, token)
-      $('#login').hide()
-
-      getPlexIp(token);
-    })
-    .fail(function(data, textStatus, errorThrown) {
-      var responseText = jQuery.parseJSON(data.responseText);
-
-      if(data.status > 399) {
-        $formError.show().html(responseText.error);
-      }
-      console.log("Login Fail!!!!", data)
-    })
-    .always(function() {
-      console.log("Login Ajax finish");
-      $loader.hide()
-      $logInButtonText.show()
-    });
-}
 
 function getPlexIp(token) {
   var ip;
@@ -370,29 +437,6 @@ function setHandleBarData(url, token, data) {
   }
 }
 
-
-function logIn() {
-  settings.username = $userName.val()
-  settings.password = $password.val()
-  // settings.serverIp = $serverIp.val()
-  storage.set('username', settings.username)
-  storage.set('password', settings.password)
-  $logInButtonText.hide()
-  $loader.show()
-  // storage.set('server', settings.serverIp)
-  // storage.has('username', function(error, hasKey) {
-  //   if (error) throw error;
-  //   if (hasKey) {
-  //     console.log('There is data stored as `username`');
-  //   }
-  // });
-
-  // setTimeout(function() {
-    console.log("Login Start");
-    getPlexToken(settings);
-  // }, 5000);
-}
-
 function logOut() {
   console.log('logout');
   $('#user-section').html('');
@@ -409,13 +453,6 @@ function logOut() {
 
 $('#login').parsley({errorsWrapper: '<ul class="parsley-errors-list animated pulse"></ul>'});
 
-$logInForm.submit(function(e) {
-  e.preventDefault();
-  if($logInForm.parsley().isValid()) {
-    console.log('FORM SUBMIT');
-    logIn();
-  }
-});
 
 $logOutButton.click(function() {
   logOut();
