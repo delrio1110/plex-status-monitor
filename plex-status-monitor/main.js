@@ -1,6 +1,6 @@
 var menubar = require('menubar')
 require('electron-debug')({
-    showDevTools: false
+    showDevTools: true
 });
 
 var opts = {

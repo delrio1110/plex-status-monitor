@@ -11,6 +11,7 @@ require('parsleyjs');
 require('electron-connect').client.create() //FOR GULP
 
 
+
 var ipcRenderer = require('electron').ipcRenderer;
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 ipcRenderer.on('asynchronous-reply', function(event, arg) {
@@ -36,13 +37,67 @@ var SignIn = React.createClass({
 });
 
 var App = React.createClass({
-  getPlexToken: function(userSettings) {
+  getInitialState: function() {
+    return {
+      username: {},
+      password: {},
+      plexToken: {},
+      plexData: {}
+    }
+  },
+  addPlexData: function(plexData) {
+    this.state.plexData = plexData
+    this.setState({plexData: this.state.plexData})
+  },
+  updateUserState: function(username, password, plexToken) {
+    this.state.username = username
+    this.setState({username: this.state.username})
+    this.state.password = password
+    this.setState({password: this.state.password})
+    this.state.plexToken = plexToken
+    this.setState({plexToken: this.state.plexToken})
+  },
+  render: function() {
+    return (
+      <div className='app'>
+        <Header/>
+        <MediaContainer addPlexData = {this.addPlexData}/>
+      </div>
+    )
+  }
+})
+
+var Header = React.createClass({
+  render: function() {
+    return (
+      <header>
+        <img src="images/plex-white.png" alt="plex logo" />
+        <h1>Status Monitor</h1>
+      </header>
+    )
+  }
+});
+
+var LoginForm = React.createClass({
+  mixins: [History],
+  logIn: function (userInfo) {
+
+    //update state
+    // storage.set('username', settings.username)
+    // storage.set('password', settings.password)
+    // $logInButtonText.hide()
+    // $loader.show()
+    console.log("Login Start");
+    this.getPlexToken(userInfo)
+  },
+  getPlexToken: function(userInfo) {
+    console.log(userInfo)
     $.ajax({
         url: 'https://plex.tv/users/sign_in.json',
         type: 'POST',
         dataType: 'json',
         beforeSend: function (json) {
-          json.setRequestHeader ("Authorization", "Basic " + btoa(userSettings.username + ":" + userSettings.password));
+          json.setRequestHeader ("Authorization", "Basic " + btoa(userInfo.username + ":" + userInfo.password));
         },
         headers: {
           'X-Plex-Platform': 'MacOSX',
@@ -58,9 +113,9 @@ var App = React.createClass({
       .done(function(data) {
         console.log("PLEX TOKEN ACQUIRED.", data)
         token = data.user.authentication_token;
-        userSettings.plexToken = token;
+        // userSettings.plexToken = token;
         console.log("PLEX TOKEN: ", token);
-        userSettings.loggedIn = true;
+        // userSettings.loggedIn = true;
         $userName.val('')
         $password.val('')
         $formError.html('').hide();
@@ -85,41 +140,29 @@ var App = React.createClass({
         $logInButtonText.show()
       });
   },
-  render: function() {
-    return (
-        <Header/>
-        <MediaContainer plexData = {}/>
-    )
-  }
-})
 
-var Header = React.createClass({
-  render: function() {
-    return (
-      <header>
-        <img src="images/plex-white.png" alt="plex logo" />
-        <h1>Status Monitor</h1>
-      </header>
-    )
-  }
-});
+  // $password.parsley().on('field:error', function() {
+  //   console.log('error')
+  //   $password.prev('.icomoon').removeClass('icon-key').addClass('icon-x2 icomoon-error')
+  //   $password.next('.parsley-errors-list').show()
+  // })
 
-var LoginForm = React.createClass({
-  mixins: [History],
-  login: function () {
-    settings.username = $userName.val()
-    settings.password = $password.val()
-    storage.set('username', settings.username)
-    storage.set('password', settings.password)
-    $logInButtonText.hide()
-    $loader.show()
-    console.log("Login Start");
+  parsleyCheck: function() {
+    this.refs.password.on('field:error', () => {
+      console.log('error')
+      // this.refs.password-icon.className = 'icomoon icon-x2 icomoon-error')
+        // $password.next('.parsley-errors-list').show()
+    })
   },
   signIn : function(e) {
     e.preventDefault()
-    if(this.parsley().isValid()) {
+    if($(e.currentTarget).parsley().isValid()) {
       console.log('FORM SUBMIT')
-      logIn();
+      var userInfo = {
+        username: this.refs.username.value,
+        password: this.refs.password.value
+      }
+      this.logIn(userInfo);
       this.history.pushState(null, '/app/')
     }
   },
@@ -127,16 +170,16 @@ var LoginForm = React.createClass({
     return (
       <div className="form-wrapper">
         <div className="form-error"></div>
-        <form id="login" onSubmit={this.signIn}>
+        <form id="login" ref="loginForm" data-parsley-validate onSubmit={this.signIn}>
           <h2>Sign In</h2>
           <div className="input-wrap">
             <div className="input-field">
-              <i className="icomoon icon-mail-envelope-closed"></i>
-              <input type="text" id="username" placeholder="Username or Email" required data-parsley-error-message="Username or Email required" />
+              <i className="icomoon icon-mail-envelope-closed" ref="username-icon"></i>
+              <input type="text" id="username" ref="username" placeholder="Username or Email" required data-parsley-error-message="Username or Email required" />
             </div>
             <div className="input-field">
-              <i className="icomoon icon-key"></i>
-              <input type="password" id="password" placeholder="Password" required data-parsley-error-message="Password is required" />
+              <i className="icomoon icon-key" ref="password-icon"></i>
+              <input type="password" id="password" ref="password" placeholder="Password" required data-parsley-error-message="Password is required" />
             </div>
           </div>
           <button className="plex-button" type="submit" id="login-button">
@@ -158,7 +201,7 @@ var MediaContainer = React.createClass({
           <div class="media-duration-bar"></div>
           <div class="media-duration-bar-highlight" data-timeline="{this.props.plexData.mediaTimeLeft}" style='width: {this.props.plexData.mediaTimeLeft};' data-media-index="{this.props.plexData.movieIndex}"></div>
         </div>
-
+{/*
         <div class="media-info-wrap">
           if ({this.props.plexData.mediaTypeIsTrack}) {
             <h3 class="media-artist">{this.props.plexData.mediaAlbulmArtist}</h3>
@@ -180,9 +223,15 @@ var MediaContainer = React.createClass({
           if ({this.props.plexData.userThumb}) {
             <img class="user-image" src="{this.props.plexData.userThumb}" alt="" />
           }
-        </div>
+        </div> */}
       </div>
     )
+  }
+})
+
+var NotFound = React.createClass({
+  render: function() {
+    return <h1>Not Found!</h1>
   }
 })
 
@@ -192,6 +241,7 @@ var routes = (
   <Router>
     <Route path ='/' component={SignIn} />
     <Route path ='/app/' component={App} />
+    <Route path ='*' component={NotFound} />
   </Router>
 )
 
