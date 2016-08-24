@@ -1,7 +1,9 @@
 var menubar = require('menubar')
+
 require('electron-debug')({
     showDevTools: true
 });
+
 
 var opts = {
   width: 500,
@@ -10,7 +12,7 @@ var opts = {
   y: 35,
   tooltip: 'Plex Status Monitor',
   icon: 'IconTemplate.png',
-  resizable: false
+  resizable: true
 }
 
 var mb = menubar(opts)
@@ -18,7 +20,8 @@ var mb = menubar(opts)
 mb.on('ready', function ready () {
   console.log('app is ready')
   // mb.setOption('icon', 'IconActive.png');
-  // mb.window.
+  // console.log(mb.window)
+  // mb.window.addDevToolsExtension('/Users/kevinknopp/Library/Application Support/Google/Chrome/' + 'default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.3_0');
   mb.tray.setPressedImage('IconPressed.png')
 })
 

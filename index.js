@@ -6,6 +6,7 @@ var electron = require('electron')
 var app = electron.app
 var Tray = electron.Tray
 var BrowserWindow = electron.BrowserWindow
+// BrowserWindow.addDevToolsExtension('/Users/kevinknopp/Library/Application Support/Google/Chrome/' + 'default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.3_0');
 
 var extend = require('extend')
 var Positioner = require('electron-positioner')
@@ -56,6 +57,12 @@ module.exports = function create (opts) {
 
     if (opts.preloadWindow || opts['preload-window']) {
       createWindow()
+      menubar.window.addDevToolsExtension('/Users/kevinknopp/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.3_0');
+      // import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
+      //
+      installExtension(REACT_DEVELOPER_TOOLS)
+          .then((name) => console.log(`Added Extension:  ${name}`))
+          .catch((err) => console.log('An error occurred: ', err));
     }
 
     menubar.showWindow = showWindow

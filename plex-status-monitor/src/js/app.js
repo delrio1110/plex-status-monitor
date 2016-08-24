@@ -11,7 +11,6 @@ require('parsleyjs');
 require('electron-connect').client.create() //FOR GULP
 
 
-
 var ipcRenderer = require('electron').ipcRenderer;
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 ipcRenderer.on('asynchronous-reply', function(event, arg) {
@@ -25,16 +24,16 @@ var settings = {
   'loggedIn': false
 }
 
-var SignIn = React.createClass({
-  render : function() {
-    return (
-      <div className='app'>
-        <Header/>
-        <LoginForm/>
-      </div>
-    )
-  }
-});
+// var SignIn = React.createClass({
+//   render : function() {
+//     return (
+//       <div className='app'>
+//         <Header/>
+//         <LoginForm/>
+//       </div>
+//     )
+//   }
+// });
 
 var App = React.createClass({
   getInitialState: function() {
@@ -49,19 +48,20 @@ var App = React.createClass({
     this.state.plexData = plexData
     this.setState({plexData: this.state.plexData})
   },
-  updateUserState: function(username, password, plexToken) {
-    this.state.username = username
+  updateUserState: function(userObject) {
+    this.state.username = userObject.username
     this.setState({username: this.state.username})
-    this.state.password = password
+    this.state.password = userObject.password
     this.setState({password: this.state.password})
-    this.state.plexToken = plexToken
+    this.state.plexToken = userObject.plexToken
     this.setState({plexToken: this.state.plexToken})
   },
   render: function() {
     return (
       <div className='app'>
         <Header/>
-        <MediaContainer addPlexData = {this.addPlexData}/>
+        <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState}/>
+        <MediaContainer plexData = {this.state.plexData}/>
       </div>
     )
   }
@@ -92,53 +92,153 @@ var LoginForm = React.createClass({
   },
   getPlexToken: function(userInfo) {
     console.log(userInfo)
+    var _this = this
     $.ajax({
-        url: 'https://plex.tv/users/sign_in.json',
-        type: 'POST',
-        dataType: 'json',
-        beforeSend: function (json) {
-          json.setRequestHeader ("Authorization", "Basic " + btoa(userInfo.username + ":" + userInfo.password));
-        },
-        headers: {
-          'X-Plex-Platform': 'MacOSX',
-          'X-Plex-Platform-Version': '10.10.5',
-          'X-Plex-Provides': '1',
-          'X-Plex-Client-Identifier': 'Plex Server Status Monitor',
-          'X-Plex-Product': 'Plex Server Status Monitor',
-          'X-Plex-Version': '1.0',
-          'X-Plex-Device': 'Max OSX',
-          'X-Plex-Device-Name': 'Plex Web'
-        }
+      url: 'https://plex.tv/users/sign_in.json',
+      type: 'POST',
+      dataType: 'json',
+      beforeSend: function (json) {
+        json.setRequestHeader ("Authorization", "Basic " + btoa(userInfo.username + ":" + userInfo.password));
+      },
+      headers: {
+        'X-Plex-Platform': 'MacOSX',
+        'X-Plex-Platform-Version': '10.10.5',
+        'X-Plex-Provides': '1',
+        'X-Plex-Client-Identifier': 'Plex Server Status Monitor',
+        'X-Plex-Product': 'Plex Server Status Monitor',
+        'X-Plex-Version': '1.0',
+        'X-Plex-Device': 'Max OSX',
+        'X-Plex-Device-Name': 'Plex Web'
+      }
+    })
+    .done((data) => {
+      console.log("PLEX TOKEN ACQUIRED.", data)
+      token = data.user.authentication_token;
+      // userSettings.plexToken = token;
+      console.log("PLEX TOKEN: ", token);
+      // userSettings.loggedIn = true;
+      userInfo.token = token
+      this.props.updateUserState(userInfo)
+      $userName.val('')
+      $password.val('')
+      $formError.html('').hide();
+
+
+      // plexQuery(url, token)
+      $('#login').hide()
+      this.getPlexIp(token);
+    })
+    .fail(function(data, textStatus, errorThrown) {
+      var responseText = jQuery.parseJSON(data.responseText);
+
+      if(data.status > 399) {
+        $formError.show().html(responseText.error);
+      }
+      console.log("Login Fail!!!!", data)
+    })
+    .always(function() {
+      console.log("Login Ajax finish");
+      $loader.hide()
+      $logInButtonText.show()
+    });
+  },
+
+  getPlexIp: function(token) {
+    var ip;
+    $.ajax({
+        url: 'https://plex.tv/api/resources?X-Plex-Token=' + token,
+        type: 'GET',
+        dataType: 'xml'
       })
-      .done(function(data) {
-        console.log("PLEX TOKEN ACQUIRED.", data)
-        token = data.user.authentication_token;
-        // userSettings.plexToken = token;
-        console.log("PLEX TOKEN: ", token);
-        // userSettings.loggedIn = true;
-        $userName.val('')
-        $password.val('')
-        $formError.html('').hide();
+      .done((data) => {
+        console.log("Get Plex Ip Done");
+        var jsonData = xmlToJson(data)
 
-
-        // plexQuery(url, token)
-        $('#login').hide()
-
-        // getPlexIp(token);
-      })
-      .fail(function(data, textStatus, errorThrown) {
-        var responseText = jQuery.parseJSON(data.responseText);
-
-        if(data.status > 399) {
-          $formError.show().html(responseText.error);
+        //Set Device data to an array in case user has more than 1 server objects
+        if (!Array.isArray(jsonData.MediaContainer.Device)) {
+          jsonData.MediaContainer.Device = [jsonData.MediaContainer.Device];
         }
-        console.log("Login Fail!!!!", data)
+
+        for (var i=0; i < jsonData.MediaContainer.Device.length; i++ ) {
+          if (jsonData.MediaContainer.Device[i]['@attributes'].accessToken == token) {
+            //Set Connection data to an array in case user has more than 1 connection objects
+            if (!Array.isArray(jsonData.MediaContainer.Device[i].Connection)) {
+              jsonData.MediaContainer.Device[i].Connection = [jsonData.MediaContainer.Device[i].Connection];
+            }
+
+            for ( var j=0; j < jsonData.MediaContainer.Device[i].Connection.length; j++ ) {
+              // console.log(jsonData.MediaContainer.Device[i].Connection[j]);
+              // console.log(jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local);
+
+              if (jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local == '0') {
+                ip = jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].uri;
+                console.log("MY SERVER IP ADDRESS: ", ip);
+                break;
+              }
+            }
+          }
+          //Make Another break here if ip variable has a length??
+        }
+
+        this.plexQuery(ip, token);
+
+      })
+      .fail(function(data) {
+        console.log("FAIL!!!!", data);
       })
       .always(function() {
-        console.log("Login Ajax finish");
-        $loader.hide()
-        $logInButtonText.show()
+        console.log("Get Plex Ip Complete");
       });
+  },
+
+  plexQuery: function(ip, token) {
+    var plexQueryTimeout
+
+    // console.log("Logged in? ", settings.loggedIn)
+    // if (!settings.loggedIn) {
+    //   console.log("BREAKOUT")
+    //   clearTimeout(plexQueryTimeout);
+    //   return false;
+    // }
+    console.log("PLEX QUERY START", ip, token)
+    console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
+    console.log("SETTINGS: ", settings)
+    $.ajax({
+      //url: ip + '/status/sessions?X-Plex-Token=' + token,
+      url: ip + '/status/sessions',
+      type: 'GET',
+      dataType: 'json',
+      headers: {
+        'Accept': 'application/json',
+        'X-Plex-Token': token
+      }
+    })
+    .done((data) => {
+      console.log("PLEX QUERY SUCCESS")
+      console.log(data);
+      // var jsonData = xmlToJson(data)
+      // console.log(jsonData)
+
+      this.props.addPlexData(data)
+      // setHandleBarData(ip, token, data)
+      console.log('LoggedIn: ', settings.loggedIn)
+        console.log("PING SERVER EVERY 30 seconds")
+        console.log("SERVER INTERVAL:", serverInterval);
+
+        // plexQueryTimeout = setTimeout(function() {
+        //   plexQuery(ip, token);
+        // }, serverInterval);
+        // console.log("AFTER TIMEOUT")
+
+      // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
+    })
+    .fail(function(data) {
+      console.log("PLEX QUERY ERROR!");
+      console.log(data);
+    })
+    .always(function() {
+      console.log("PLEX QUERY RUN");
+    });
   },
 
   // $password.parsley().on('field:error', function() {
@@ -163,7 +263,7 @@ var LoginForm = React.createClass({
         password: this.refs.password.value
       }
       this.logIn(userInfo);
-      this.history.pushState(null, '/app/')
+      // this.history.pushState(null, '/app/')
     }
   },
   render: function() {
@@ -193,35 +293,124 @@ var LoginForm = React.createClass({
 });
 
 var MediaContainer = React.createClass({
+  setPlexData: function(data) {
+    var mediaInfo = [];
+    console.log(data._children);
+    // console.log(data.MediaContainer['@attributes'].size);
+    if (data._children.length < 1) {
+      $('#user-section').html('<i className="icomoon-hipster icon-hipster"></i><h3>No Active Users</h3>')
+      $logOutButton.show();
+      settings.isActive = false;
+      settings.userCount = '0';
+      ipcRenderer.send('asynchronous-message', settings);
+
+      return;
+    }
+
+    else {
+      console.log(data);
+      console.log(data._children);
+
+
+      // if (!Array.isArray(data.MediaContainer.Track)) {
+      //   //IF NOT ARRAY MAKE IT AN ARRAY!
+      //   data.MediaContainer.Track = [data.MediaContainer.Track];
+      // }
+
+      // for (var i=0; i<data._children.length; i++) {
+      //
+      // }
+
+      //MOVIE / TV SHOW DATA
+      // if (!Array.isArray(data.MediaContainer.Video)) {
+      //   //IF NOT ARRAY MAKE IT AN ARRAY!
+      //   data.MediaContainer.Video = [data.MediaContainer.Video];
+      // }
+      for (var i=0; i<data._children.length; i++) {
+        var mediaInfoData = {}
+
+        var mediaDurationinMs = data._children[i].duration
+        var mediaOffsetinMs = data._children[i].viewOffset
+        var mediaDuration = msToTime(mediaDurationinMs)
+        var mediaOffset = msToTime(mediaOffsetinMs)
+
+        var mediaPercentWatched = ((data._children[i].viewOffset) / (data._children[i].duration) * 100)
+        var date = new Date()
+        var mediaCompletionEstimate = new Date(date.setMilliseconds(date.getMilliseconds() + (mediaDurationinMs - mediaOffsetinMs))).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
+
+
+
+        console.log("MOVIE DURATION: ", mediaDuration)
+        console.log("MOVIE WATCHED: ", mediaOffset)
+        console.log(data._children[i]._children)
+        // if (Array.isArray(data._children[i]._children)) {
+          console.log(data._children[i]._children)
+          for (var j=0; j<data._children[i]._children.length; j++) {
+
+            if (data._children[i]._children[j]._elementType == 'User') {
+                mediaInfoData.mediaType = data._children[i]._elementType
+                mediaInfoData.userThumb = data._children[i]._children[j].thumb;
+                mediaInfoData.userName = data._children[i]._children[j].title;
+                mediaInfoData.mediaTitle = data._children[i].title;
+                mediaInfoData.mediaAlbulmTitle = data._children[i].parentTitle;
+                mediaInfoData.mediaAlbulmArtist = data._children[i].grandparentTitle;
+                mediaInfoData.mediaImg = url + data._children[i].art + '?X-Plex-Token=' + token;
+                mediaInfoData.mediaYear = data._children[i].year;
+                mediaInfoData.mediaDuration = mediaDuration;
+                mediaInfoData.mediaOffset = mediaOffset;
+                mediaInfoData.mediaCompletion = mediaCompletionEstimate;
+                mediaInfoData.mediaTimeLeft = mediaPercentWatched + '%';
+
+                if(data._children[i]._elementType == 'Track') {
+                  mediaInfoData.mediaTypeIsTrack = true;
+                }
+            }
+
+            if (data._children[i]._children[j]._elementType == 'Player') {
+              mediaInfoData.playerTitle = data._children[i]._children[j].title;
+              mediaInfoData.playerState = data._children[i]._children[j].state;
+            }
+
+            if (j == data._children[i]._children.length-1) {
+              mediaInfo.push(mediaInfoData)
+            }
+          } //end inner loop
+          // data._children[i]._children = {data._children[i]._children}
+        // }
+        // mediaInfo.push(mediaInfoData);
+      }// end outer loop
+    }
+  },
   render: function() {
     return(
-      <div class="media-wrapper clearfix">
-        <div class="media-content-wrap">
-          <img src="{this.props.plexData.mediaImg}" class="media-image" alt="" />
-          <div class="media-duration-bar"></div>
-          <div class="media-duration-bar-highlight" data-timeline="{this.props.plexData.mediaTimeLeft}" style='width: {this.props.plexData.mediaTimeLeft};' data-media-index="{this.props.plexData.movieIndex}"></div>
+      // setPlexData({this.props.plexData})
+      <div className="media-wrapper clearfix">
+        <div className="media-content-wrap">
+          <img src="{this.props.plexData.mediaImg}" className="media-image" alt="" />
+          <div className="media-duration-bar"></div>
+          {/* <div className="media-duration-bar-highlight" data-timeline="{this.props.plexData.mediaTimeLeft}" style={{width: {this.props.plexData.mediaTimeLeft} }} data-media-index="{this.props.plexData.movieIndex}"></div> */}
         </div>
 {/*
-        <div class="media-info-wrap">
+        <div className="media-info-wrap">
           if ({this.props.plexData.mediaTypeIsTrack}) {
-            <h3 class="media-artist">{this.props.plexData.mediaAlbulmArtist}</h3>
-            <h4 class="media-albulm">{this.props.plexData.mediaAlbulmTitle}</h4>
-            <h4 class="media-title">{this.props.plexData.mediaTitle}</h4>
+            <h3 className="media-artist">{this.props.plexData.mediaAlbulmArtist}</h3>
+            <h4 className="media-albulm">{this.props.plexData.mediaAlbulmTitle}</h4>
+            <h4 className="media-title">{this.props.plexData.mediaTitle}</h4>
             <p>Completion Time:<br />{this.props.plexData.mediaCompletion}</p>
             <p>{this.props.plexData.playerTitle}</p>
             <p>{this.props.plexData.playerState}</p>
           } else {
-            <h3 class="media-title">{this.props.plexData.mediaTitle}</h3>
-            <p class="media-year">{this.props.plexData.mediaYear}</p>
+            <h3 className="media-title">{this.props.plexData.mediaTitle}</h3>
+            <p className="media-year">{this.props.plexData.mediaYear}</p>
             <p>Completion Time:<br />{this.props.plexData.mediaCompletion}</p>
             <p>{this.props.plexData.playerTitle}</p>
             <p>{this.props.plexData.playerState}</p>
           }
         </div>
-        <div class="user-info-wrap">
-          <p class="user-name">{this.props.plexData.userName}</p>
+        <div className="user-info-wrap">
+          <p className="user-name">{this.props.plexData.userName}</p>
           if ({this.props.plexData.userThumb}) {
-            <img class="user-image" src="{this.props.plexData.userThumb}" alt="" />
+            <img className="user-image" src="{this.props.plexData.userThumb}" alt="" />
           }
         </div> */}
       </div>
@@ -239,8 +428,7 @@ var NotFound = React.createClass({
 
 var routes = (
   <Router>
-    <Route path ='/' component={SignIn} />
-    <Route path ='/app/' component={App} />
+    <Route path ='/' component={App} />
     <Route path ='*' component={NotFound} />
   </Router>
 )
@@ -393,7 +581,7 @@ function setHandleBarData(url, token, data) {
   console.log(data._children);
   // console.log(data.MediaContainer['@attributes'].size);
   if (data._children.length < 1) {
-    $('#user-section').html('<i class="icomoon-hipster icon-hipster"></i><h3>No Active Users</h3>')
+    $('#user-section').html('<i className="icomoon-hipster icon-hipster"></i><h3>No Active Users</h3>')
     $logOutButton.show();
     settings.isActive = false;
     settings.userCount = '0';
