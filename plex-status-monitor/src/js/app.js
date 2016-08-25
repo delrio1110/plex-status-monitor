@@ -24,16 +24,16 @@ var settings = {
   'loggedIn': false
 }
 
-// var SignIn = React.createClass({
-//   render : function() {
-//     return (
-//       <div className='app'>
-//         <Header/>
-//         <LoginForm/>
-//       </div>
-//     )
-//   }
-// });
+var SignIn = React.createClass({
+  render : function() {
+    return (
+      <div className='login'>
+        <Header/>
+        <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState}/>
+      </div>
+    )
+  }
+});
 
 var App = React.createClass({
   getInitialState: function() {
@@ -41,12 +41,15 @@ var App = React.createClass({
       username: {},
       password: {},
       plexToken: {},
-      plexData: {}
+      plexData: {},
+      loggedIn: false
     }
   },
   addPlexData: function(plexData) {
+    console.log('ADD PLEX DATA')
     this.state.plexData = plexData
     this.setState({plexData: this.state.plexData})
+    console.log(this.state.plexData)
   },
   updateUserState: function(userObject) {
     this.state.username = userObject.username
@@ -55,17 +58,23 @@ var App = React.createClass({
     this.setState({password: this.state.password})
     this.state.plexToken = userObject.plexToken
     this.setState({plexToken: this.state.plexToken})
+    this.state.loggedIn = true;
+    this.setState({loggedIn: this.state.loggedIn})
   },
   render: function() {
+    let login
+    if (!this.state.loggedIn) {
+      login = <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState}/>
+    }
     return (
       <div className='app'>
         <Header/>
-        <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState}/>
+        {login}
         <MediaContainer plexData = {this.state.plexData}/>
       </div>
     )
   }
-})
+});
 
 var Header = React.createClass({
   render: function() {
@@ -125,7 +134,7 @@ var LoginForm = React.createClass({
 
 
       // plexQuery(url, token)
-      $('#login').hide()
+      // $('#login').hide()
       this.getPlexIp(token);
     })
     .fail(function(data, textStatus, errorThrown) {
@@ -220,6 +229,7 @@ var LoginForm = React.createClass({
       // console.log(jsonData)
 
       this.props.addPlexData(data)
+      this.history.pushState(null, '/app/')
       // setHandleBarData(ip, token, data)
       console.log('LoggedIn: ', settings.loggedIn)
         console.log("PING SERVER EVERY 30 seconds")
@@ -263,7 +273,6 @@ var LoginForm = React.createClass({
         password: this.refs.password.value
       }
       this.logIn(userInfo);
-      // this.history.pushState(null, '/app/')
     }
   },
   render: function() {
@@ -293,9 +302,17 @@ var LoginForm = React.createClass({
 });
 
 var MediaContainer = React.createClass({
+  getInitialState: function() {
+    return {
+      mediaInfo: []
+    }
+  },
+  addMediaInfo: function(mediaInfoData) {
+    this.state.mediaInfo.push(mediaInfoData)
+    this.setState({mediaInfo: this.state.mediaInfo})
+  },
   setPlexData: function(data) {
-    var mediaInfo = [];
-    console.log(data._children);
+    console.log('SETTING PLEX DATA!', data._children);
     // console.log(data.MediaContainer['@attributes'].size);
     if (data._children.length < 1) {
       $('#user-section').html('<i className="icomoon-hipster icon-hipster"></i><h3>No Active Users</h3>')
@@ -372,7 +389,7 @@ var MediaContainer = React.createClass({
             }
 
             if (j == data._children[i]._children.length-1) {
-              mediaInfo.push(mediaInfoData)
+              this.addMediaInfo(mediaInfoData)
             }
           } //end inner loop
           // data._children[i]._children = {data._children[i]._children}
@@ -381,42 +398,74 @@ var MediaContainer = React.createClass({
       }// end outer loop
     }
   },
+  renderMediaInfoWrap: function(key) {
+    console.log('RENDER MEDIA DISPLAY')
+    this.setPlexData(this.props.plexData)
+    return <mediaInfofWrap key={key} index={key} details={this.state.mediaInfo[key]} />
+  },
   render: function() {
     return(
-      // setPlexData({this.props.plexData})
-      <div className="media-wrapper clearfix">
-        <div className="media-content-wrap">
-          <img src="{this.props.plexData.mediaImg}" className="media-image" alt="" />
-          <div className="media-duration-bar"></div>
-          {/* <div className="media-duration-bar-highlight" data-timeline="{this.props.plexData.mediaTimeLeft}" style={{width: {this.props.plexData.mediaTimeLeft} }} data-media-index="{this.props.plexData.movieIndex}"></div> */}
-        </div>
-{/*
-        <div className="media-info-wrap">
-          if ({this.props.plexData.mediaTypeIsTrack}) {
-            <h3 className="media-artist">{this.props.plexData.mediaAlbulmArtist}</h3>
-            <h4 className="media-albulm">{this.props.plexData.mediaAlbulmTitle}</h4>
-            <h4 className="media-title">{this.props.plexData.mediaTitle}</h4>
-            <p>Completion Time:<br />{this.props.plexData.mediaCompletion}</p>
-            <p>{this.props.plexData.playerTitle}</p>
-            <p>{this.props.plexData.playerState}</p>
-          } else {
-            <h3 className="media-title">{this.props.plexData.mediaTitle}</h3>
-            <p className="media-year">{this.props.plexData.mediaYear}</p>
-            <p>Completion Time:<br />{this.props.plexData.mediaCompletion}</p>
-            <p>{this.props.plexData.playerTitle}</p>
-            <p>{this.props.plexData.playerState}</p>
-          }
-        </div>
-        <div className="user-info-wrap">
-          <p className="user-name">{this.props.plexData.userName}</p>
-          if ({this.props.plexData.userThumb}) {
-            <img className="user-image" src="{this.props.plexData.userThumb}" alt="" />
-          }
-        </div> */}
+      <div className='mediaInfoWrapper'>
+        {this.state.mediaInfo.map(this.renderMediaInfoWrap)}
       </div>
     )
   }
-})
+});
+
+var mediaInfoWrap = React.createClass({
+  render: function() {
+    let userThumb = this.props.details.userThumb;
+    if(userThumb) {
+      let userThumbImg = <img className="user-image" src="{this.props.plexData.userThumb}" alt="" />
+    }
+    return (
+      <div className="media-wrapper clearfix">
+
+        <div className="media-content-wrap">
+          <img src="{this.props.plexData.mediaImg}" className="media-image" alt="" />
+          <div className="media-duration-bar"></div>
+          <div className="media-duration-bar-highlight" data-timeline="{this.props.plexData.mediaTimeLeft}" style={{width: '{this.props.plexData.mediaTimeLeft}'}} data-media-index="{this.props.plexData.movieIndex}"></div>
+        </div>
+
+        {this.props.plexData.mediaTypeIsTrack ? <mediaInfoWrapTrackContent details = {this.props.details} /> : <mediaInfoWrapMovieContent details = {this.props.details} /> }
+
+        <div className="user-info-wrap">
+          <p className="user-name">{this.props.details.userName}</p>
+          {userThumbImg}
+        </div>
+      </div>
+    )
+  }
+});
+
+var mediaInfoWrapTrackContent = React.createClass({
+  render: function() {
+    return (
+      <div className="media-info-wrap">
+        <h3 className="media-artist">{this.props.details.mediaAlbulmArtist}</h3>
+        <h4 className="media-albulm">{this.props.details.mediaAlbulmTitle}</h4>
+        <h4 className="media-title">{this.props.details.mediaTitle}</h4>
+        <p>Completion Time:<br />{this.props.details.mediaCompletion}</p>
+        <p>{this.props.details.playerTitle}</p>
+        <p>{this.props.details.playerState}</p>
+      </div>
+    )
+  }
+});
+
+var mediaInfoWrapMovieContent = React.createClass({
+  render: function() {
+    return (
+      <div className="media-info-wrap">
+        <h3 className="media-title">{this.props.details.mediaTitle}</h3>
+        <p className="media-year">{this.props.details.mediaYear}</p>
+        <p>Completion Time:<br />{this.props.details.mediaCompletion}</p>
+        <p>{this.props.details.playerTitle}</p>
+        <p>{this.props.details.playerState}</p>
+      </div>
+    )
+  }
+});
 
 var NotFound = React.createClass({
   render: function() {
@@ -429,6 +478,7 @@ var NotFound = React.createClass({
 var routes = (
   <Router>
     <Route path ='/' component={App} />
+    <Route path ='/app' component={App} />
     <Route path ='*' component={NotFound} />
   </Router>
 )
