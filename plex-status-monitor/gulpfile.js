@@ -33,9 +33,7 @@ gulp.task('scripts', function() {
 
   return gulp.src("src/js/**/*.js")
     .pipe(sourcemaps.init())
-    .pipe(babel({
-      presets: ['react', 'es2015']
-    }))
+    .pipe(babel())
     .pipe(concat("main.js"))
     .pipe(sourcemaps.write("."))
     .pipe(gulp.dest("build/js"));
