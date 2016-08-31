@@ -1,13 +1,18 @@
-var Handlebars = require('handlebars');
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Router, Route, browserHistroy, History, IndexRoute } from 'react-router'
-window.jQuery = window.$ = require('jquery');
-import storage from 'electron-json-storage'
+import { Router, Route, browserHistroy, hashHistory, IndexRoute } from 'react-router'
+// import storage from 'electron-json-storage'
 import 'parsleyjs'
-require('electron-connect').client.create() //FOR GULP
+console.log('thing')
+// import Application from './modules/Application'
+// import Home from './modules/Home'
+// import NotFound from './modules/NotFound'
+window.jQuery = window.$ = require('jquery');
+var Handlebars = require('handlebars');
+// require('electron-connect').client.create() //FOR GULP
 
-var ipcRenderer = require('electron').ipcRenderer;
+// alert('this happens')
+var ipcRenderer = window.ipcRenderer;
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints "pong"
 ipcRenderer.on('asynchronous-reply', function(event, arg) {
   console.log(arg); // prints "pong"
@@ -20,24 +25,21 @@ var settings = {
   'loggedIn': false
 }
 
+// alert(__dirname + './modules/Application')
 //MODULES
-const Application = require('./modules/Application');
-// const Home = require('./modules/Home');
-// const NotFound = require('./modules/NotFound');
-
-// const Application = require('./modules/Application').default
-// import Home from './modules/Home'
-// import LoginForm from './modules/LoginForm'
-// import Header from './modules/Header'
-// import NotFound from './modules/NotFound'
+import Application  from './modules/Application'
+import Home from './modules/Home'
+import LoginForm from './modules/LoginForm'
+import NotFound from './modules/NotFound'
 
 
 
 var routes = (
-  <Router history={browserHistroy}>
+  <Router history={hashHistory}>
     <Route path ='/' component={Application}>
-      <IndexRoute component={Home}/>
+      <IndexRoute component={Home} />
     </Route>
+    <Route path ='/app' component={Application} />
     <Route path ='*' component={NotFound} />
   </Router>
 )
@@ -87,103 +89,103 @@ var url = 'http://';
 //   }
 // });
 
-function getPlexIp(token) {
-  var ip;
-  $.ajax({
-      url: 'https://plex.tv/api/resources?X-Plex-Token=' + token,
-      type: 'GET',
-      dataType: 'xml'
-    })
-    .done(function(data) {
-      console.log("Get Plex Ip Done");
-      var jsonData = xmlToJson(data)
+// function getPlexIp(token) {
+//   var ip;
+//   $.ajax({
+//       url: 'https://plex.tv/api/resources?X-Plex-Token=' + token,
+//       type: 'GET',
+//       dataType: 'xml'
+//     })
+//     .done(function(data) {
+//       console.log("Get Plex Ip Done");
+//       var jsonData = xmlToJson(data)
+//
+//       //Set Device data to an array in case user has more than 1 server objects
+//       if (!Array.isArray(jsonData.MediaContainer.Device)) {
+//         jsonData.MediaContainer.Device = [jsonData.MediaContainer.Device];
+//       }
+//
+//       for (var i=0; i < jsonData.MediaContainer.Device.length; i++ ) {
+//         if (jsonData.MediaContainer.Device[i]['@attributes'].accessToken == token) {
+//           //Set Connection data to an array in case user has more than 1 connection objects
+//           if (!Array.isArray(jsonData.MediaContainer.Device[i].Connection)) {
+//             jsonData.MediaContainer.Device[i].Connection = [jsonData.MediaContainer.Device[i].Connection];
+//           }
+//
+//           for ( var j=0; j < jsonData.MediaContainer.Device[i].Connection.length; j++ ) {
+//             // console.log(jsonData.MediaContainer.Device[i].Connection[j]);
+//             // console.log(jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local);
+//
+//             if (jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local == '0') {
+//               ip = jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].uri;
+//               console.log("MY SERVER IP ADDRESS: ", ip);
+//               break;
+//             }
+//           }
+//         }
+//         //Make Another break here if ip variable has a length??
+//       }
+//
+//       plexQuery(ip, token);
+//
+//     })
+//     .fail(function(data) {
+//       console.log("FAIL!!!!", data);
+//     })
+//     .always(function() {
+//       console.log("Get Plex Ip Complete");
+//     });
+// }
 
-      //Set Device data to an array in case user has more than 1 server objects
-      if (!Array.isArray(jsonData.MediaContainer.Device)) {
-        jsonData.MediaContainer.Device = [jsonData.MediaContainer.Device];
-      }
-
-      for (var i=0; i < jsonData.MediaContainer.Device.length; i++ ) {
-        if (jsonData.MediaContainer.Device[i]['@attributes'].accessToken == token) {
-          //Set Connection data to an array in case user has more than 1 connection objects
-          if (!Array.isArray(jsonData.MediaContainer.Device[i].Connection)) {
-            jsonData.MediaContainer.Device[i].Connection = [jsonData.MediaContainer.Device[i].Connection];
-          }
-
-          for ( var j=0; j < jsonData.MediaContainer.Device[i].Connection.length; j++ ) {
-            // console.log(jsonData.MediaContainer.Device[i].Connection[j]);
-            // console.log(jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local);
-
-            if (jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local == '0') {
-              ip = jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].uri;
-              console.log("MY SERVER IP ADDRESS: ", ip);
-              break;
-            }
-          }
-        }
-        //Make Another break here if ip variable has a length??
-      }
-
-      plexQuery(ip, token);
-
-    })
-    .fail(function(data) {
-      console.log("FAIL!!!!", data);
-    })
-    .always(function() {
-      console.log("Get Plex Ip Complete");
-    });
-}
-
-function plexQuery(ip, token) {
-  var plexQueryTimeout
-
-  console.log("Logged in? ", settings.loggedIn)
-  if (!settings.loggedIn) {
-    console.log("BREAKOUT")
-    clearTimeout(plexQueryTimeout);
-    return false;
-  }
-  console.log("PLEX QUERY START", ip, token)
-  console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
-  console.log("SETTINGS: ", settings)
-  $.ajax({
-    //url: ip + '/status/sessions?X-Plex-Token=' + token,
-    url: ip + '/status/sessions',
-    type: 'GET',
-    dataType: 'json',
-    headers: {
-      'Accept': 'application/json',
-      'X-Plex-Token': token
-    }
-
-  })
-  .done(function(data) {
-    console.log("PLEX QUERY SUCCESS")
-    console.log(data);
-    // var jsonData = xmlToJson(data)
-    // console.log(jsonData)
-
-    setHandleBarData(ip, token, data)
-    console.log('LoggedIn: ', settings.loggedIn)
-      console.log("PING SERVER EVERY 30 seconds")
-      console.log("SERVER INTERVAL:", serverInterval);
-
-      plexQueryTimeout = setTimeout(function() {
-        plexQuery(ip, token);
-      }, serverInterval);
-      // console.log("AFTER TIMEOUT")
-
-    // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
-  })
-  .fail(function(data) {
-    console.log("PLEX QUERY ERROR!");
-    console.log(data);
-  })
-  .always(function() {
-    console.log("PLEX QUERY RUN");
-  });
-}
+// function plexQuery(ip, token) {
+//   var plexQueryTimeout
+//
+//   console.log("Logged in? ", settings.loggedIn)
+//   if (!settings.loggedIn) {
+//     console.log("BREAKOUT")
+//     clearTimeout(plexQueryTimeout);
+//     return false;
+//   }
+//   console.log("PLEX QUERY START", ip, token)
+//   console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
+//   console.log("SETTINGS: ", settings)
+//   $.ajax({
+//     //url: ip + '/status/sessions?X-Plex-Token=' + token,
+//     url: ip + '/status/sessions',
+//     type: 'GET',
+//     dataType: 'json',
+//     headers: {
+//       'Accept': 'application/json',
+//       'X-Plex-Token': token
+//     }
+//
+//   })
+//   .done(function(data) {
+//     console.log("PLEX QUERY SUCCESS")
+//     console.log(data);
+//     // var jsonData = xmlToJson(data)
+//     // console.log(jsonData)
+//
+//     setHandleBarData(ip, token, data)
+//     console.log('LoggedIn: ', settings.loggedIn)
+//       console.log("PING SERVER EVERY 30 seconds")
+//       console.log("SERVER INTERVAL:", serverInterval);
+//
+//       plexQueryTimeout = setTimeout(function() {
+//         plexQuery(ip, token);
+//       }, serverInterval);
+//       // console.log("AFTER TIMEOUT")
+//
+//     // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
+//   })
+//   .fail(function(data) {
+//     console.log("PLEX QUERY ERROR!");
+//     console.log(data);
+//   })
+//   .always(function() {
+//     console.log("PLEX QUERY RUN");
+//   });
+// }
 
 // function setHandleBarData(url, token, data) {
 //   var mediaInfo = [];

@@ -1,7 +1,8 @@
 import React from 'react'
+import { hashHistory } from 'react-router'
+import { xmlToJson } from '../helperFunctions'
 
 export default React.createClass({
-  mixins: [History],
   logIn: function (userInfo) {
 
     //update state
@@ -15,6 +16,14 @@ export default React.createClass({
   getPlexToken: function(userInfo) {
     console.log(userInfo)
     var _this = this
+    var $userName = $('#username'),
+    $password = $('#password'),
+    $logInForm = $('#login'),
+    $logInButton = $('#login-button'),
+    $logInButtonText = $('#login-button span'),
+    $loader = $('.loader'),
+    $formError = $('.form-error'),
+    $logOutButton = $('#logout-button');
     $.ajax({
       url: 'https://plex.tv/users/sign_in.json',
       type: 'POST',
@@ -35,12 +44,14 @@ export default React.createClass({
     })
     .done((data) => {
       console.log("PLEX TOKEN ACQUIRED.", data)
-      token = data.user.authentication_token;
+      let token = data.user.authentication_token;
       // userSettings.plexToken = token;
       console.log("PLEX TOKEN: ", token);
       // userSettings.loggedIn = true;
       userInfo.token = token
       this.props.updateUserState(userInfo)
+
+      // FORM RESET
       $userName.val('')
       $password.val('')
       $formError.html('').hide();
@@ -102,6 +113,7 @@ export default React.createClass({
           //Make Another break here if ip variable has a length??
         }
 
+        this.props.updateUserIP(ip)
         this.plexQuery(ip, token);
 
       })
@@ -124,7 +136,7 @@ export default React.createClass({
     // }
     console.log("PLEX QUERY START", ip, token)
     console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
-    console.log("SETTINGS: ", settings)
+    // console.log("SETTINGS: ", settings)
     $.ajax({
       //url: ip + '/status/sessions?X-Plex-Token=' + token,
       url: ip + '/status/sessions',
@@ -142,11 +154,11 @@ export default React.createClass({
       // console.log(jsonData)
 
       this.props.addPlexData(data)
-      this.History.pushState(null, '/app/')
+      // hashHistory.push('/app')
       // setHandleBarData(ip, token, data)
-      console.log('LoggedIn: ', settings.loggedIn)
+      // console.log('LoggedIn: ', settings.loggedIn)
         console.log("PING SERVER EVERY 30 seconds")
-        console.log("SERVER INTERVAL:", serverInterval);
+        // console.log("SERVER INTERVAL:", serverInterval);
 
         // plexQueryTimeout = setTimeout(function() {
         //   plexQuery(ip, token);

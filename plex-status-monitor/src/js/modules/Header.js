@@ -1,6 +1,6 @@
 import React from 'react'
 
-var Header = React.createClass({
+export default React.createClass({
   render: function() {
     return (
       <header>

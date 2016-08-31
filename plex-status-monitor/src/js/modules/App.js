@@ -31,14 +31,9 @@ export default React.createClass({
     this.setState({loggedIn: this.state.loggedIn})
   },
   render: function() {
-    let login
-    if (!this.state.loggedIn) {
-      login = <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState}/>
-    }
     return (
       <div className='app'>
         <Header/>
-        {login}
         <MediaContainer plexData = {this.state.plexData}/>
       </div>
     )

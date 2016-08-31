@@ -1,5 +1,6 @@
 import React from 'react'
 import MediaInfoWrap from './MediaInfoWrap'
+import { msToTime } from '../helperFunctions'
 
 export default React.createClass({
   getInitialState: function() {
@@ -7,12 +8,25 @@ export default React.createClass({
       mediaInfo: []
     }
   },
+  // shouldComponentUpdate: function() {
+  //   if (!this.props.plexData) {
+  //     console.log(this.props.plexData.length) 
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // },
+  componentWillReceiveProps: function() {
+    this.setPlexData(this.props.plexData, this.props.userIP, this.props.plexToken)
+    console.log('SET PLEX DATA WILL MOUNT')
+  },
   addMediaInfo: function(mediaInfoData) {
     this.state.mediaInfo.push(mediaInfoData)
     this.setState({mediaInfo: this.state.mediaInfo})
   },
-  setPlexData: function(data) {
+  setPlexData: function(data, ip, token) {
     console.log('SETTING PLEX DATA!', data._children);
+    if(!data._children) return
     // console.log(data.MediaContainer['@attributes'].size);
     if (data._children.length < 1) {
       $('#user-section').html('<i className="icomoon-hipster icon-hipster"></i><h3>No Active Users</h3>')
@@ -71,7 +85,7 @@ export default React.createClass({
                 mediaInfoData.mediaTitle = data._children[i].title;
                 mediaInfoData.mediaAlbulmTitle = data._children[i].parentTitle;
                 mediaInfoData.mediaAlbulmArtist = data._children[i].grandparentTitle;
-                mediaInfoData.mediaImg = url + data._children[i].art + '?X-Plex-Token=' + token;
+                mediaInfoData.mediaImg = ip + data._children[i].art + '?X-Plex-Token=' + token;
                 mediaInfoData.mediaYear = data._children[i].year;
                 mediaInfoData.mediaDuration = mediaDuration;
                 mediaInfoData.mediaOffset = mediaOffset;
@@ -100,12 +114,14 @@ export default React.createClass({
   },
   renderMediaInfoWrap: function(key) {
     console.log('RENDER MEDIA DISPLAY')
-    this.setPlexData(this.props.plexData)
+    // this.setPlexData(this.props.plexData)
     return <MediaInfofWrap key={key} index={key} details={this.state.mediaInfo[key]} />
   },
   render: function() {
+    console.log('render media info wrap')
     return(
       <div className='mediaInfoWrapper'>
+        {console.log('MediaInfoObject',this.state.mediaInfo)}
         {this.state.mediaInfo.map(this.renderMediaInfoWrap)}
       </div>
     )

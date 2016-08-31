@@ -96,10 +96,13 @@
 
 
     <div class="console"></div>
+    <script>
+      window.ipcRenderer = require('electron').ipcRenderer;
+      require('electron-connect').client.create()
+    </script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript" src="build/js/main.js"></script>
+    <script type="text/javascript" src="build/js/index.js"></script>
     <!-- <script type="text/javascript" src="build/js/app.js"></script> -->
-    <!-- <script>require('electron-connect').client.create()</script> -->
 
   </body>
 </html>
