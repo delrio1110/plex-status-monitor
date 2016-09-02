@@ -3,25 +3,29 @@ import MediaInfoWrapTrackContent from './mediaInfoWrapTrackContent'
 import MediaInfoWrapMovieContent from './mediaInfoWrapMovieContent'
 
 export default React.createClass({
+
   render: function() {
-    let userThumb = this.props.details.userThumb;
-    if(userThumb) {
-      let userThumbImg = <img className="user-image" src="{this.props.plexData.userThumb}" alt="" />
-    }
+    console.log('MEDIA INFO WRAP CONTAINER PROPS', JSON.stringify(this.props));
+
+    let userThumbImg = <img className="user-image" src={this.props.details.userThumb} alt="" />
+    let mediaDurationBarPercent = {width: this.props.details.mediaTimeLeft}
+    
     return (
       <div className="media-wrapper clearfix">
 
         <div className="media-content-wrap">
-          <img src="{this.props.plexData.mediaImg}" className="media-image" alt="" />
+          <img src={this.props.details.mediaImg} className="media-image" alt="" />
           <div className="media-duration-bar"></div>
-          <div className="media-duration-bar-highlight" data-timeline="{this.props.plexData.mediaTimeLeft}" style={{width: '{this.props.plexData.mediaTimeLeft}'}} data-media-index="{this.props.plexData.movieIndex}"></div>
+          <div className="media-duration-bar-highlight" data-timeline={this.props.details.mediaTimeLeft} style={mediaDurationBarPercent} data-media-index={this.props.details.movieIndex}></div>
         </div>
 
-        {this.props.plexData.mediaTypeIsTrack ? <MediaInfoWrapTrackContent details = {this.props.details} /> : <MediaInfoWrapMovieContent details = {this.props.details} /> }
+        {console.log('MEDIA INFO WRAO PROPSSS?!' ,this.props)}
+
+        {this.props.details.mediaTypeIsTrack ? <MediaInfoWrapTrackContent details = {this.props.details} /> : <MediaInfoWrapMovieContent details = {this.props.details} /> }
 
         <div className="user-info-wrap">
           <p className="user-name">{this.props.details.userName}</p>
-          {userThumbImg}
+          {userThumbImg || ''}
         </div>
       </div>
     )

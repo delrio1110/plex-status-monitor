@@ -3,9 +3,9 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
-var fs = require('fs')
+var fs = require('fs');
 var autoprefixer = require('gulp-autoprefixer');
-const rename = require('gulp-rename')
+const rename = require('gulp-rename');
 // const electron = require('electron');
 const electron = require('electron-connect').server.create();
 
@@ -34,8 +34,6 @@ gulp.task('scss', function () {
   .pipe(sourcemaps.write())
   .pipe(autoprefixer())
   .pipe(gulp.dest('build/css'));
-  electron.reload;
-  // .pipe(reload({stream:true}))
 });
 
 gulp.task('copyfonts', function() {
@@ -60,14 +58,14 @@ function buildScript(file, watch) {
       .bundle()
       .on('error', handleErrors)
       .pipe(source('index.js'))
-      .pipe(buffer())
+      // .pipe(buffer())
       .pipe(gulp.dest('build/js'))
       // .pipe(rename('index.js'))
       // .pipe(sourcemaps.init({loadMaps: true}))
         // Add transformation tasks to the pipeline here.
         // .pipe(uglify())
       // .pipe(sourcemaps.write('.'))
-      .pipe(gulp.dest('build/js'))
+      // .pipe(gulp.dest('build/js'))
 }
 
 gulp.task('scripts', function() {
@@ -89,8 +87,17 @@ gulp.task('scripts-watch', function() {
 //     .pipe(gulp.dest("build/js"));
 // });
 
+gulp.task('electron-restart', function() {
+  electron.stop()
+  electron.start()
+})
+
 gulp.task('default', ['scss', 'scripts', 'copyfonts', 'start'], function() {
-  gulp.watch('src/scss/**/*.scss', ['scss', electron.reload])
+  // Restart browser process
+  // gulp.watch('src/scss/**/*.scss', ['scss', electron.restart])
+  // gulp.watch('src/js/**/*.js', ['scripts', electron.restart])
+  // // Reload renderer process
+  // gulp.watch(['main.js', 'index.html'], electron.reload);
 });
 
 

@@ -49,6 +49,7 @@ export default React.createClass({
       console.log("PLEX TOKEN: ", token);
       // userSettings.loggedIn = true;
       userInfo.token = token
+      console.log('USERINFO', userInfo)
       this.props.updateUserState(userInfo)
 
       // FORM RESET
@@ -158,12 +159,12 @@ export default React.createClass({
       // setHandleBarData(ip, token, data)
       // console.log('LoggedIn: ', settings.loggedIn)
         console.log("PING SERVER EVERY 30 seconds")
-        // console.log("SERVER INTERVAL:", serverInterval);
+        console.log("SERVER INTERVAL:", this.props.serverInterval);
 
-        // plexQueryTimeout = setTimeout(function() {
-        //   plexQuery(ip, token);
-        // }, serverInterval);
-        // console.log("AFTER TIMEOUT")
+        plexQueryTimeout = setTimeout(() => {
+          this.plexQuery(ip, token);
+        }, this.props.serverInterval);
+        console.log("AFTER TIMEOUT")
 
       // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
     })

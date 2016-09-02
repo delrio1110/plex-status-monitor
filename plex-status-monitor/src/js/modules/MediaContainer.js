@@ -16,31 +16,31 @@ export default React.createClass({
   //     return true;
   //   }
   // },
-  componentWillReceiveProps: function() {
+  componentWillMount: function () {
+    console.log('COMPONENT WILL MOUNT',this.props)
     this.setPlexData(this.props.plexData, this.props.userIP, this.props.plexToken)
-    console.log('SET PLEX DATA WILL MOUNT')
   },
-  addMediaInfo: function(mediaInfoData) {
-    this.state.mediaInfo.push(mediaInfoData)
-    this.setState({mediaInfo: this.state.mediaInfo})
+  componentWillReceiveProps: function(props) {
+    console.log('COMPONENT WILL RECEIVE PROPS:', props)
+    this.setPlexData(props.plexData, props.userIP, props.userToken)
+  },
+  addMediaInfo: function(mediaInfoDataList) {
+    console.log('saving media info', mediaInfoDataList)
+    this.setState({mediaInfo: mediaInfoDataList})
+
+    //update User Count for electron app
+    this.props.updateUserCount(mediaInfoDataList.length)
   },
   setPlexData: function(data, ip, token) {
-    console.log('SETTING PLEX DATA!', data._children);
-    if(!data._children) return
-    // console.log(data.MediaContainer['@attributes'].size);
-    if (data._children.length < 1) {
-      $('#user-section').html('<i className="icomoon-hipster icon-hipster"></i><h3>No Active Users</h3>')
-      $logOutButton.show();
-      settings.isActive = false;
-      settings.userCount = '0';
-      ipcRenderer.send('asynchronous-message', settings);
 
-      return;
-    }
+    if (Object.keys(data).length === 0) return
 
     else {
+      console.log('SETTING PLEX DATA!', data._children);
       console.log(data);
       console.log(data._children);
+
+      var mediaInfoDataList = []
 
 
       // if (!Array.isArray(data.MediaContainer.Track)) {
@@ -57,7 +57,7 @@ export default React.createClass({
       //   //IF NOT ARRAY MAKE IT AN ARRAY!
       //   data.MediaContainer.Video = [data.MediaContainer.Video];
       // }
-      for (var i=0; i<data._children.length; i++) {
+      for ( var i = 0; i < data._children.length; i++ ) {
         var mediaInfoData = {}
 
         var mediaDurationinMs = data._children[i].duration
@@ -92,9 +92,8 @@ export default React.createClass({
                 mediaInfoData.mediaCompletion = mediaCompletionEstimate;
                 mediaInfoData.mediaTimeLeft = mediaPercentWatched + '%';
 
-                if(data._children[i]._elementType == 'Track') {
-                  mediaInfoData.mediaTypeIsTrack = true;
-                }
+                //Check if mediaType is a Track
+                (data._children[i]._elementType == 'Track') ? mediaInfoData.mediaTypeIsTrack = true : mediaInfoData.mediaTypeIsTrack = false
             }
 
             if (data._children[i]._children[j]._elementType == 'Player') {
@@ -102,27 +101,34 @@ export default React.createClass({
               mediaInfoData.playerState = data._children[i]._children[j].state;
             }
 
+            // debugger;
+
             if (j == data._children[i]._children.length-1) {
-              this.addMediaInfo(mediaInfoData)
+              mediaInfoDataList.push(mediaInfoData)
+              // this.addMediaInfo(mediaInfoData)
             }
           } //end inner loop
+          // this.addMediaInfo(mediaInfoData)
           // data._children[i]._children = {data._children[i]._children}
         // }
         // mediaInfo.push(mediaInfoData);
       }// end outer loop
+      this.addMediaInfo(mediaInfoDataList)
+
     }
-  },
-  renderMediaInfoWrap: function(key) {
-    console.log('RENDER MEDIA DISPLAY')
-    // this.setPlexData(this.props.plexData)
-    return <MediaInfofWrap key={key} index={key} details={this.state.mediaInfo[key]} />
   },
   render: function() {
     console.log('render media info wrap')
+    console.log(this.state)
     return(
       <div className='mediaInfoWrapper'>
         {console.log('MediaInfoObject',this.state.mediaInfo)}
-        {this.state.mediaInfo.map(this.renderMediaInfoWrap)}
+        {console.log('UPDATINGGG?!')}
+        {this.state.mediaInfo.map(function(data, key) {
+          console.log('WHAT IS THE DATA?', data)
+        })}
+        {this.state.mediaInfo.map((data, key) => 
+          <MediaInfoWrap key={key} index={key} details={data} />)}
       </div>
     )
   }
