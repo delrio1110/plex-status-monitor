@@ -10,7 +10,7 @@ export default React.createClass({
   },
   // shouldComponentUpdate: function() {
   //   if (!this.props.plexData) {
-  //     console.log(this.props.plexData.length) 
+  //     console.log(this.props.plexData.length)
   //     return false;
   //   } else {
   //     return true;
@@ -25,11 +25,10 @@ export default React.createClass({
     this.setPlexData(props.plexData, props.userIP, props.userToken)
   },
   addMediaInfo: function(mediaInfoDataList) {
-    console.log('saving media info', mediaInfoDataList)
-    this.setState({mediaInfo: mediaInfoDataList})
-
     //update User Count for electron app
     this.props.updateUserCount(mediaInfoDataList.length)
+    console.log('saving media info', mediaInfoDataList)
+    this.setState({mediaInfo: mediaInfoDataList})
   },
   setPlexData: function(data, ip, token) {
 
@@ -119,17 +118,20 @@ export default React.createClass({
   },
   render: function() {
     console.log('render media info wrap')
-    console.log(this.state)
-    return(
-      <div className='mediaInfoWrapper'>
-        {console.log('MediaInfoObject',this.state.mediaInfo)}
-        {console.log('UPDATINGGG?!')}
-        {this.state.mediaInfo.map(function(data, key) {
-          console.log('WHAT IS THE DATA?', data)
-        })}
-        {this.state.mediaInfo.map((data, key) => 
-          <MediaInfoWrap key={key} index={key} details={data} />)}
-      </div>
-    )
+    if (this.state.mediaInfo.length < 1) {
+      return(
+        <div className='mediaInfoWrapper'>
+          <i className="icomoon-hipster icon-hipster"></i>
+          <h3>No Active Users</h3>
+        </div>
+      )
+    } else {
+      return(
+        <div className='mediaInfoWrapper'>
+          {this.state.mediaInfo.map((data, key) =>
+            <MediaInfoWrap key={key} index={key} details={data} />)}
+        </div>
+      )
+    }
   }
 });

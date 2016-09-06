@@ -33,7 +33,7 @@ var ipcMain = require('electron').ipcMain;
 
       mb.tray.setImage('IconActive.png')
       mb.tray.setPressedImage('IconPressed.png')
-      mb.tray.setTitle(appState.userCount)
+      mb.tray.setTitle(appState.userCount.toString())
       console.log(mb.getOption('icon'))
       console.log('ACTIVE APP')
     }

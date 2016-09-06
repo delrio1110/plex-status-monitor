@@ -36,26 +36,22 @@ export default React.createClass({
     console.log('ADD PLEX DATA')
     this.setState({userIP: ip})
   },
-
-  updateUserCount: function(useCount) {
-    // this.setState({userCount: useCount})
-    alert('run')
-    //update App Icon
-    // this.updateAppIcon(useCount)
+  updateUserCount: function(userCount) {
+    // this.setState({userCount: userCount})
+    console.log('=====UPDATE USER COUNT=======')
+    this.updateAppIcon(userCount)
   },
-
   updateAppIcon: function(userCount) {
-
-    var appSettings
-    // userCount > 0 ? appSettings.isActive = true : appSettings.isActive = false
+    console.log('===updateAppIcon===')
+    let appSettings = {}
+    appSettings.isActive = false
     appSettings.userCount = userCount
-    appSettings.isActive = true
-    
+    userCount > 0 ? appSettings.isActive = true : appSettings.isActive = false
+
     var ipcRenderer = window.ipcRenderer;
-    alert(appSettings)
+    console.log(appSettings)
     ipcRenderer.send('asynchronous-message', appSettings);
   },
-
   render: function() {
     let login
     if (!this.state.loggedIn) {
@@ -66,7 +62,7 @@ export default React.createClass({
       <div className='app'>
         <Header/>
         {login}
-        {console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)} 
+        {console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)}
         <MediaContainer plexData={this.state.plexData} userToken={this.state.plexToken} userIP={this.state.userIP} updateUserCount={this.updateUserCount}/>
       </div>
     )
