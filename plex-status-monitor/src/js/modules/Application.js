@@ -55,7 +55,7 @@ export default React.createClass({
   render: function() {
     let login
     if (!this.state.loggedIn) {
-      login = <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState} updateUserIP={this.updateUserIP} serverInterval={this.state.serverInterval}/>
+      login = <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState} updateUserIP={this.updateUserIP} serverInterval={this.state.serverInterval} loggedIn={this.state.loggedIn}/>
     }
     console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)
     return (

@@ -11,6 +11,7 @@ $plex-ui:     #CC7B19;
 $plex-button: #E5A00D;
 $plex-text:   #FF8A00;
 $plex-hover:  #f9BE03;
+$plex-black:  #323232;
 $form-gray:   #868C96;
 $header-gray: #575B61;
 $fail-red:    #B94A48;
@@ -18,12 +19,22 @@ $good-green:  #468847;
 $white:       #FFFFFF;
 $black:       #000000;
 
+html, body {
+  margin: 0 auto;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0);
+}
+
 body {
-  background-color: #323232;
-  /*background-color: transparent;*/
+  // background-color: $plex-black;
+  // background-color: transparent;
   color: $white;
   font-family: 'Open Sans';
-  overflow: scroll;
+}
+
+.app-wrap {
+  background-color: $plex-black;
+  border-radius: 8px;
 }
 
 .form-wrapper {
@@ -83,12 +94,17 @@ h2 {
 }
 
 h3 {
-  text-align: center;
-  font-family: 'OpenSans-SemiboldItalic';
+  text-align: left;
+  font-family: 'OpenSans-Semibold';
+  font-size: 1em;
 }
 
 h4 {
   margin: 10px;
+}
+
+p {
+  font-size: 0.85em;
 }
 
 input {
@@ -235,6 +251,41 @@ button.plex-button {
   position: relative;
 }
 
+.media-content-wrap {
+  border: 2px solid $plex-black;
+  transition: border 0.3s;
+  border-radius: 4px;
+
+  &:hover {
+    border: 2px solid $plex-ui;
+
+    .media-image.loaded {
+      opacity: 0.5;
+    }
+
+    .media-information {
+      opacity: 1;
+    }
+  }
+}
+
+.media-information {
+  position: absolute;
+  transition: opacity 0.3s;
+  opacity: 0;
+  z-index: 1;
+  padding: 10px;
+}
+
+.media-image {
+  opacity: 0;
+  transition: opacity 0.3s;
+
+  &.loaded {
+    opacity: 1;
+  }
+}
+
 .media-duration-bar {
   position: absolute;
   bottom: 0;
@@ -271,7 +322,7 @@ button.plex-button {
 }
 
 .loader {
-  display: none;
+  // display: none;
   margin: 0 auto;
   font-size: 3px;
   position: relative;
@@ -324,13 +375,13 @@ button.plex-button {
 	height: 0;
 }
 
-/*.arrow:before {
+.arrow:before {
   content: "";
   height: 0;
   width: 0;
   border-width: 0 8px 12px 8px;
   border-style: solid;
-  border-color: transparent transparent $white transparent;
+  border-color: transparent transparent $plex-black transparent;
   position: absolute;
   top: 0px;
   left: 50%;
@@ -340,7 +391,7 @@ button.plex-button {
 .arrow {
   position: relative;
   padding: 12px 0;
-}*/
+}
 
 /* Parsley CSS */
 input.parsley-success,

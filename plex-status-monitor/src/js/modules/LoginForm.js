@@ -1,8 +1,14 @@
 import React from 'react'
 import { hashHistory } from 'react-router'
 import { xmlToJson } from '../helperFunctions'
+import CSSTransitionGroup from 'react-addons-css-transition-group'
 
 export default React.createClass({
+  getInitialState: function() {
+    return {
+      loadingSignIn: false,
+    }
+  },
   logIn: function (userInfo) {
 
     //update state
@@ -50,7 +56,7 @@ export default React.createClass({
       // userSettings.loggedIn = true;
       userInfo.token = token
       console.log('USERINFO', userInfo)
-      this.props.updateUserState(userInfo)
+      // this.props.updateUserState(userInfo)
 
       // FORM RESET
       $userName.val('')
@@ -60,7 +66,7 @@ export default React.createClass({
 
       // plexQuery(url, token)
       // $('#login').hide()
-      this.getPlexIp(token);
+      this.getPlexIp(userInfo);
     })
     .fail(function(data, textStatus, errorThrown) {
       var responseText = jQuery.parseJSON(data.responseText);
@@ -72,15 +78,14 @@ export default React.createClass({
     })
     .always(function() {
       console.log("Login Ajax finish");
-      $loader.hide()
-      $logInButtonText.show()
+      // $loader.hide()
+      // $logInButtonText.show()
     });
   },
 
-  getPlexIp: function(token) {
-    var ip;
+  getPlexIp: function(userInfo) {
     $.ajax({
-        url: 'https://plex.tv/api/resources?X-Plex-Token=' + token,
+        url: 'https://plex.tv/api/resources?X-Plex-Token=' + userInfo.token,
         type: 'GET',
         dataType: 'xml'
       })
@@ -94,7 +99,7 @@ export default React.createClass({
         }
 
         for (var i=0; i < jsonData.MediaContainer.Device.length; i++ ) {
-          if (jsonData.MediaContainer.Device[i]['@attributes'].accessToken == token) {
+          if (jsonData.MediaContainer.Device[i]['@attributes'].accessToken == userInfo.token) {
             //Set Connection data to an array in case user has more than 1 connection objects
             if (!Array.isArray(jsonData.MediaContainer.Device[i].Connection)) {
               jsonData.MediaContainer.Device[i].Connection = [jsonData.MediaContainer.Device[i].Connection];
@@ -105,8 +110,8 @@ export default React.createClass({
               // console.log(jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local);
 
               if (jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].local == '0') {
-                ip = jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].uri;
-                console.log("MY SERVER IP ADDRESS: ", ip);
+                userInfo.ip = jsonData.MediaContainer.Device[i].Connection[j]['@attributes'].uri;
+                console.log("MY SERVER IP ADDRESS: ", userInfo.ip);
                 break;
               }
             }
@@ -114,8 +119,10 @@ export default React.createClass({
           //Make Another break here if ip variable has a length??
         }
 
-        this.props.updateUserIP(ip)
-        this.plexQuery(ip, token);
+        this.props.updateUserIP(userInfo.ip)
+        this.props.updateUserState(userInfo)
+        this.stopSignInLoader()
+        this.plexQuery(userInfo.ip, userInfo.token);
 
       })
       .fail(function(data) {
@@ -201,7 +208,19 @@ export default React.createClass({
       this.logIn(userInfo);
     }
   },
+  startSignInLoader: function() {
+    this.setState({loadingSignIn: true})
+  },
+  stopSignInLoader: function() {
+    this.setState({loadingSignIn: false})
+  },
   render: function() {
+    let signInContent
+    if (!this.state.loadingSignIn) {
+      signInContent = <span>Sign In</span>
+    } else {
+      signInContent = <span><div className="loader"></div></span>
+    }
     return (
       <div className="form-wrapper">
         <div className="form-error"></div>
@@ -217,10 +236,13 @@ export default React.createClass({
               <input type="password" id="password" ref="password" placeholder="Password" required data-parsley-error-message="Password is required" />
             </div>
           </div>
-          <button className="plex-button" type="submit" id="login-button">
-            <span>Sign In</span>
-            <div className="loader"></div>
-          </button>
+          <CSSTransitionGroup className="plex-button" type="submit" id="login-button" onClick={this.startSignInLoader}
+          component="button"
+          transitionName="loader"
+          transitionEnterTimeout={300}
+          transitionLeaveTimeout={300}>
+            {signInContent}
+          </CSSTransitionGroup>
         </form>
       </div>
     )

@@ -3,99 +3,19 @@
     <title>Status Monitor</title>
     <link rel="stylesheet" href="build/css/main.css">
   </head>
-  <body>
-
-    <div class='main'>
-      <!-- <header>
-        <img src="images/plex-white.png" alt="plex logo">
-        <h1>Status Monitor</h1>
-      </header> -->
+  <body class="arrow">
+    <div class="app-wrap">
+      <div class='main'></div>
     </div>
-    <!-- <div class="form-wrapper">
-      <div class="form-error"></div>
-      <form id="login">
-        <h2>Sign In</h2>
 
-        <div class="input-wrap">
-          <div class="input-field">
-            <i class="icomoon icon-mail-envelope-closed"></i>
-            <input type="text" id="username" placeholder="Username or Email" required data-parsley-error-message="Username or Email required">
-          </div>
-          <div class="input-field">
-            <i class="icomoon icon-key"></i>
-            <input type="password" id="password" placeholder="Password" required data-parsley-error-message="Password is required">
-          </div>
-        </div>
 
-        <button class="plex-button" type="submit" id="login-button">
-          <span>Sign In</span>
-          <div class="loader"></div>
-        </button>
-      </form>
-    </div> -->
+    
 
-    <section id="user-section">
-    </section>
-
-    <script id="active-users" type="text/x-handlebars-template">
-      {{#each this}}
-      <div class="media-wrapper clearfix">
-        <div class="media-content-wrap">
-          <img src="{{mediaImg}}" class="media-image" alt="">
-          <div class="media-duration-bar"></div>
-          <div class="media-duration-bar-highlight" data-timeline="{{mediaTimeLeft}}" style='width: {{mediaTimeLeft}};' data-media-index="{{movieIndex}}"></div>
-        </div>
-
-        <div class="media-info-wrap">
-          {{#if mediaTypeIsTrack}}
-            <h3 class="media-artist">{{mediaAlbulmArtist}}</h3>
-            <h4 class="media-albulm">{{mediaAlbulmTitle}}</h4>
-            <h4 class="media-title">{{mediaTitle}}</h4>
-            <p>Completion Time:<br>{{mediaCompletion}}</p>
-            <p>{{playerTitle}}</p>
-            <p>{{playerState}}</p>
-          {{else}}
-            <h3 class="media-title">{{mediaTitle}}</h3>
-            <p class="media-year">{{mediaYear}}</p>
-            <p>Completion Time:<br>{{mediaCompletion}}</p>
-            <p>{{playerTitle}}</p>
-            <p>{{playerState}}</p>
-          {{/if}}
-        </div>
-        <div class="user-info-wrap">
-          <p class="user-name">{{userName}}</p>
-          {{#if userThumb}}
-            <img class="user-image" src="{{userThumb}}" alt="">
-          {{/if}}
-        </div>
-      </div>
-      {{/each}}
-    </script>
-
-    <div class="plex-button" id="logout-button">Logout</div>
-
-  <!--   <section>
-      <a class="media-poster-container " href="#">
-      <div class="media-poster">
-      <div class="media-poster-overlay"></div>
-      <div class="media-poster-top-overlay"></div>
-      <div class="media-poster-actions">
-        <button class="play-btn media-poster-btn btn-link" tabindex="-1">
-            <i class="glyphicon play"></i>
-        </button>
-        <button class="edit-btn media-poster-btn btn-link" tabindex="-1">
-          <i class="glyphicon pencil"></i>
-        </button>
-        <button class="info-btn media-poster-btn btn-link" tabindex="-1">
-          <i class="glyphicon circle-info"></i>
-        </button>
-      </div>
-      <button class="close-btn btn-link btn-gray" href="#"><i class="glyphicon remove-2"></i></button> <i class="device-icon device-icon-chrome"></i> <div class="session-player">Plex Web (Chrome)</div> <div class="session-state">Paused</div> <div class="session-transcode-details"> <p class="session-transcode-title"> <span class="session-transcode">Transcoding</span> <span class="session-transcode-throttled hidden"></span> </p> <p class="session-transcode-video"> <span class="session-transcode-label">Video</span> <span class="session-transcode-video-decision">Transcode (h264)</span> </p> <p class="session-transcode-audio"> <span class="session-transcode-label">Audio</span> <span class="session-transcode-audio-decision">Direct Stream</span> </p> </div> <div class="media-progress"><div class=""><div class="media-progress-track"></div> <div class="media-progress-pct" style="width: 85%;"></div> </div></div> </div> <div class="session-user pull-right"> <div class="user-poster img-circle loaded" style="background-image: url(&quot;blob:https%3A//app.plex.tv/a06a8a62-15d9-482d-8e77-cbd99edfe7ee&quot;);"></div> <div class="session-username media-heading secondary">kknopper</div> </div> <div class="media-title media-heading">The Peanuts Movie</div> <div class="media-subtitle-1 media-heading secondary">2015</div> </a>
-    </section> -->
+    <!-- <div class="plex-button" id="logout-button">Logout</div> -->
 
 
 
-    <div class="console"></div>
+
     <script>
       window.ipcRenderer = require('electron').ipcRenderer;
       require('electron-connect').client.create()
