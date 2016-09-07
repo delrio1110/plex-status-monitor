@@ -61,6 +61,7 @@ export default React.createClass({
     return (
       <div className='app'>
         <Header/>
+      {/*this.props.children*/}
         {login}
         {console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)}
         <MediaContainer plexData={this.state.plexData} userToken={this.state.plexToken} userIP={this.state.userIP} updateUserCount={this.updateUserCount}/>

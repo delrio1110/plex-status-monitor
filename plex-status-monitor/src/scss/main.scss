@@ -379,13 +379,26 @@ button.plex-button {
   content: "";
   height: 0;
   width: 0;
-  border-width: 0 8px 12px 8px;
+  border-width: 0 12px 12px 12px;
   border-style: solid;
   border-color: transparent transparent $plex-black transparent;
   position: absolute;
   top: 0px;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.arrow:after {
+  content:"";
+  position: absolute;
+  height: 15px;
+  width: 45px;
+  border-radius: 0 40px 40px 0;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -15px;
+  background: rgba(0, 0, 0, 0);
+  box-shadow: 0 -45px 0 0 rgba(0, 0, 0, 0);
 }
 
 .arrow {

@@ -10,7 +10,7 @@ var opts = {
   height: 700,
   transparent: true,
   frame: false,
-  y: 35,
+  y: 30,
   tooltip: 'Plex Status Monitor',
   icon: 'IconTemplate.png',
   resizable: true
