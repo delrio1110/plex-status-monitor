@@ -1,6 +1,7 @@
 import React from 'react'
-import MediaInfoWrap from './MediaInfoWrap'
+import MediaItem from './MediaItem'
 import { msToTime } from '../helperFunctions'
+import NoActiveUsers from './NoActiveUsers'
 
 export default React.createClass({
   getInitialState: function() {
@@ -25,10 +26,32 @@ export default React.createClass({
     this.setPlexData(props.plexData, props.userIP, props.userToken)
   },
   addMediaInfo: function(mediaInfoDataList) {
+    this.notifyUser(mediaInfoDataList)
+
     //update User Count for electron app
     this.props.updateUserCount(mediaInfoDataList.length)
     console.log('saving media info', mediaInfoDataList)
     this.setState({mediaInfo: mediaInfoDataList})
+  },
+  notifyUser: function(newMediaData) {
+    console.log('NOTIFICATION TEST')
+    console.log(newMediaData)
+    console.log(this.state.mediaInfo)
+    for (var i = 0; i < newMediaData.length; i++) {
+      if(this.state.mediaInfo[i]) {
+        if(newMediaData[i].mediaTitle != this.state.mediaInfo[i].mediaTitle) {
+          new Notification(newMediaData[i].mediaTitle, {
+            body: newMediaData[i].userName + ' started playing ' + newMediaData[i].mediaTitle + ' on ' + newMediaData[i].playerTitle,
+            icon: '../../../images/app-icon.png'
+          });
+        }
+      } else {
+        new Notification(newMediaData[i].mediaTitle, {
+          body: newMediaData[i].userName + ' started playing ' + newMediaData[i].mediaTitle + ' on ' + newMediaData[i].playerTitle,
+          icon: '../../../images/app-icon.png'
+        });
+      }
+    }
   },
   setPlexData: function(data, ip, token) {
 
@@ -85,7 +108,7 @@ export default React.createClass({
                 mediaInfoData.mediaAlbulmTitle = data._children[i].parentTitle;
                 mediaInfoData.mediaAlbulmArtist = data._children[i].grandparentTitle;
                 mediaInfoData.mediaImg = ip + data._children[i].art + '?X-Plex-Token=' + token;
-                mediaInfoData.mediaYear = data._children[i].year;
+                mediaInfoData.mediaMovieYear = data._children[i].year;
                 mediaInfoData.mediaDuration = mediaDuration;
                 mediaInfoData.mediaOffset = mediaOffset;
                 mediaInfoData.mediaCompletion = mediaCompletionEstimate;
@@ -120,16 +143,13 @@ export default React.createClass({
     console.log('render media info wrap')
     if (this.state.mediaInfo.length < 1) {
       return(
-        <div className='mediaInfoWrapper'>
-          <i className="icomoon-hipster icon-hipster"></i>
-          <h3>No Active Users</h3>
-        </div>
+        <NoActiveUsers/>
       )
     } else {
       return(
         <div className='mediaInfoWrapper'>
           {this.state.mediaInfo.map((data, key) =>
-            <MediaInfoWrap key={key} index={key} details={data} />)}
+            <MediaItem key={key} index={key} details={data} />)}
         </div>
       )
     }

@@ -24,6 +24,7 @@ module.exports = function create (opts) {
   opts.width = opts.width || 400
   opts.height = opts.height || 400
   opts.tooltip = opts.tooltip || ''
+  opts.icon = 'plex-status-monitor/images/app-icon.png'
 
   app.on('ready', appReady)
 
@@ -57,12 +58,6 @@ module.exports = function create (opts) {
 
     if (opts.preloadWindow || opts['preload-window']) {
       createWindow()
-      menubar.window.addDevToolsExtension('/Users/kevinknopp/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.3_0');
-      // import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
-      //
-      installExtension(REACT_DEVELOPER_TOOLS)
-          .then((name) => console.log(`Added Extension:  ${name}`))
-          .catch((err) => console.log('An error occurred: ', err));
     }
 
     menubar.showWindow = showWindow
@@ -80,11 +75,14 @@ module.exports = function create (opts) {
       menubar.emit('create-window')
       var defaults = {
         show: false,
-        frame: false
+        frame: false,
+        icon: 'plex-status-monitor/images/app-icon.png'
       }
+      asdfl;kasdf;lkasd;flkasd;lfka;sldfk;ladsfk
 
       var winOpts = extend(defaults, opts)
       menubar.window = new BrowserWindow(winOpts)
+      menubar.window.icon = 'plex-status-monitor/images/app-icon.png'
 
       menubar.positioner = new Positioner(menubar.window)
 

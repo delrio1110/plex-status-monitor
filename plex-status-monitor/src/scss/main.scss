@@ -1,23 +1,12 @@
 @import 'libs/animate';
 @import 'libs/icomoon';
+@import 'modules/colors';
+@import 'modules/noActiveUsers';
 
 @font-face {
     font-family: Open Sans;
     src: url(../fonts/open-sans/OpenSans-Regular.ttf);
 }
-
-/* COLORS */
-$plex-ui:     #CC7B19;
-$plex-button: #E5A00D;
-$plex-text:   #FF8A00;
-$plex-hover:  #f9BE03;
-$plex-black:  #323232;
-$form-gray:   #868C96;
-$header-gray: #575B61;
-$fail-red:    #B94A48;
-$good-green:  #468847;
-$white:       #FFFFFF;
-$black:       #000000;
 
 html, body {
   margin: 0 auto;
@@ -26,8 +15,6 @@ html, body {
 }
 
 body {
-  // background-color: $plex-black;
-  // background-color: transparent;
   color: $white;
   font-family: 'Open Sans';
 }
@@ -106,6 +93,8 @@ h4 {
 p {
   font-size: 0.85em;
 }
+
+//LOGIN SCSS
 
 input {
   display: inline-block;
@@ -216,6 +205,43 @@ button.plex-button {
   }
 }
 
+.loader {
+  // display: none;
+  margin: 0 auto;
+  font-size: 3px;
+  position: relative;
+  text-indent: -9999em;
+  border-top: 1.1em solid rgba(255,255,255,.2);
+  border-right: 1.1em solid rgba(255,255,255,.2);
+  border-bottom: 1.1em solid rgba(255,255,255,.2);
+  border-left: 1.1em solid $white;
+  transform: translateZ(0);
+  animation: spin 1.1s infinite linear;
+
+  &, &:after {
+    border-radius: 50%;
+    width: 10em;
+    height: 10em;
+  }
+}
+
+@-webkit-keyframes spin {
+  0% {
+    transform: rotate(0)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}
+@keyframes spin {
+    0% {
+      transform: rotate(0)
+    }
+    100% {
+      transform: rotate(360deg)
+    }
+}
+
 #logout-button {
   display: none;
   margin-top: 50px;
@@ -319,43 +345,6 @@ button.plex-button {
   float: right;
   margin-left: 10px;
   margin-top: 15px;
-}
-
-.loader {
-  // display: none;
-  margin: 0 auto;
-  font-size: 3px;
-  position: relative;
-  text-indent: -9999em;
-  border-top: 1.1em solid rgba(255,255,255,.2);
-  border-right: 1.1em solid rgba(255,255,255,.2);
-  border-bottom: 1.1em solid rgba(255,255,255,.2);
-  border-left: 1.1em solid $white;
-  transform: translateZ(0);
-  animation: spin 1.1s infinite linear;
-
-  &, &:after {
-    border-radius: 50%;
-    width: 10em;
-    height: 10em;
-  }
-}
-
-@-webkit-keyframes spin {
-  0% {
-    transform: rotate(0)
-  }
-  100% {
-    transform: rotate(360deg)
-  }
-}
-@keyframes spin {
-    0% {
-      transform: rotate(0)
-    }
-    100% {
-      transform: rotate(360deg)
-    }
 }
 
 .arrow-up {
