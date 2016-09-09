@@ -40,15 +40,17 @@ export default React.createClass({
     for (var i = 0; i < newMediaData.length; i++) {
       if(this.state.mediaInfo[i]) {
         if(newMediaData[i].mediaTitle != this.state.mediaInfo[i].mediaTitle) {
+          console.log('==============Notification==============')
           new Notification(newMediaData[i].mediaTitle, {
             body: newMediaData[i].userName + ' started playing ' + newMediaData[i].mediaTitle + ' on ' + newMediaData[i].playerTitle,
-            icon: '../../../images/app-icon.png'
+            silent: true
           });
         }
       } else {
+        console.log('==============Notification==============')
         new Notification(newMediaData[i].mediaTitle, {
           body: newMediaData[i].userName + ' started playing ' + newMediaData[i].mediaTitle + ' on ' + newMediaData[i].playerTitle,
-          icon: '../../../images/app-icon.png'
+          silent: true
         });
       }
     }

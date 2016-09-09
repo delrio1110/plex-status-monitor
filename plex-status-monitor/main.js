@@ -1,4 +1,7 @@
 var menubar = require('menubar')
+var electron = require('electron')
+var Menu = electron.Menu;
+var BrowserWindow = electron.BrowserWindow
 
 require('electron-debug')({
   showDevTools: true
@@ -24,6 +27,29 @@ mb.on('ready', function ready () {
   console.log('app is ready')
   // mb.setOption('icon', 'IconActive.png');
   // console.log(mb.window)
+  mb.tray.on('right-clicked', function(){
+    var contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'About Plex Status Monitor',
+        click: function() {
+          new BrowserWindow()
+        }
+      },
+      {
+        label: 'Preferences...',
+        click: function() {
+          new BrowserWindow()
+        }
+      },
+      {
+        label: 'Quit',
+        click: function() {
+          mb.app.quit()
+        }
+      }
+    ])
+    mb.tray.popUpContextMenu(contextMenu);
+  });
   // mb.window.addDevToolsExtension('/Users/kevinknopp/Library/Application Support/Google/Chrome/' + 'default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.3_0');
   mb.tray.setPressedImage('IconPressed.png')
   mb.app.dock.setIcon('images/app-icon.png')
