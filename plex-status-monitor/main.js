@@ -2,6 +2,9 @@ var menubar = require('menubar')
 var electron = require('electron')
 var Menu = electron.Menu;
 var BrowserWindow = electron.BrowserWindow
+var Dialog = electron.dialog
+var app = electron.app
+var appName = app.getName()
 
 require('electron-debug')({
   showDevTools: true
@@ -32,7 +35,13 @@ mb.on('ready', function ready () {
       {
         label: 'About Plex Status Monitor',
         click: function() {
-          new BrowserWindow()
+          // Dialog.showMessageBox({
+          //   title: `About ${appName}`,
+          //   message: `${appName} ${app.getVersion()}`,
+          //   detail: 'Created by Kevin Knopp',
+          //   icon: 'images/app-icon.png',
+          //   buttons: []
+          // });
         }
       },
       {
