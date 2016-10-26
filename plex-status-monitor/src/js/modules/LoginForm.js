@@ -122,6 +122,7 @@ export default React.createClass({
         this.props.updateUserIP(userInfo.ip)
         this.props.updateUserState(userInfo)
         this.stopSignInLoader()
+        hashHistory.push('/#/app')
         this.plexQuery(userInfo.ip, userInfo.token);
 
       })
@@ -162,7 +163,7 @@ export default React.createClass({
       // console.log(jsonData)
 
       this.props.addPlexData(data)
-      // hashHistory.push('/app')
+      hashHistory.push('/#/app')
       // setHandleBarData(ip, token, data)
       // console.log('LoggedIn: ', settings.loggedIn)
         console.log("PING SERVER EVERY 30 seconds")

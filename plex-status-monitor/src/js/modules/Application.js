@@ -53,18 +53,26 @@ export default React.createClass({
     ipcRenderer.send('asynchronous-message', appSettings);
   },
   render: function() {
-    let login
-    if (!this.state.loggedIn) {
-      login = <LoginForm addPlexData={this.addPlexData} updateUserState={this.updateUserState} updateUserIP={this.updateUserIP} serverInterval={this.state.serverInterval} loggedIn={this.state.loggedIn}/>
-    }
+    var children = React.Children.map(this.props.children, (child) => {
+      return React.cloneElement(child, {
+        addPlexData: this.addPlexData,
+        updateUserState: this.updateUserState,
+        updateUserIP: this.updateUserIP,
+        serverInterval: this.state.serverInterval,
+        loggedIn: this.state.loggedIn,
+        plexData: this.state.plexData,
+        userToken: this.state.plexToken,
+        userIP: this.state.userIP,
+        updateUserCount: this.updateUserCount
+      })
+    })
+
+
     console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)
     return (
       <div className='app'>
         <Header/>
-      {/*this.props.children*/}
-        {login}
-        {console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)}
-        <MediaContainer plexData={this.state.plexData} userToken={this.state.plexToken} userIP={this.state.userIP} updateUserCount={this.updateUserCount}/>
+        {children}
       </div>
     )
   }

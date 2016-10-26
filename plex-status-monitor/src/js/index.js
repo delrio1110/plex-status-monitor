@@ -23,16 +23,18 @@ var settings = {
 //MODULES
 import Application  from './modules/Application'
 import Home from './modules/Home'
-import LoginForm from './modules/LoginForm'
+import MediaContainer from './modules/MediaContainer'
 import NotFound from './modules/NotFound'
+import NoActiveUsers from './modules/NoActiveUsers'
 
 var routes = (
   <Router history={hashHistory}>
     <Route path ='/' component={Application}>
       <IndexRoute component={Home} />
+      <Route path ='/app' component={MediaContainer} />
+      <Route path ='/inactive' component={NoActiveUsers} />
+      <Route path ='*' component={NotFound} />
     </Route>
-    <Route path ='/app' component={Application} />
-    <Route path ='*' component={NotFound} />
   </Router>
 )
 
