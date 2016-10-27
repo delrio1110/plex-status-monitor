@@ -122,7 +122,6 @@ export default React.createClass({
         this.props.updateUserIP(userInfo.ip)
         this.props.updateUserState(userInfo)
         this.stopSignInLoader()
-        hashHistory.push('/#/app')
         this.plexQuery(userInfo.ip, userInfo.token);
 
       })
