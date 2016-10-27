@@ -124,6 +124,8 @@ export default React.createClass({
         this.props.updateUserState(userInfo)
         this.stopSignInLoader()
         this.plexQuery(userInfo.ip, userInfo.token);
+        console.log('HASH HISTORY CHANGE ROUTE')
+        hashHistory.push('/app')
 
       })
       .fail(function(data) {
@@ -162,7 +164,7 @@ export default React.createClass({
         // console.log(jsonData)
 
         this.props.addPlexData(data)
-        // hashHistory.push('/app')
+        hashHistory.push('/app')
         // setHandleBarData(ip, token, data)
         // console.log('LoggedIn: ', settings.loggedIn)
           console.log("PING SERVER EVERY 30 seconds")
@@ -177,6 +179,7 @@ export default React.createClass({
       })
       .fail(function(data) {
         console.log("PLEX QUERY ERROR!");
+        console.log("Is your server online?");
         console.log(data);
       })
       .always(function() {
