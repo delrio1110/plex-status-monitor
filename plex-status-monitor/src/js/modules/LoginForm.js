@@ -2,6 +2,7 @@ import React from 'react'
 import { hashHistory } from 'react-router'
 import { xmlToJson } from '../helperFunctions'
 import CSSTransitionGroup from 'react-addons-css-transition-group'
+import isOnline from 'is-online'
 
 export default React.createClass({
   getInitialState: function() {
@@ -136,52 +137,61 @@ export default React.createClass({
   plexQuery: function(ip, token) {
     var plexQueryTimeout
 
-    // console.log("Logged in? ", settings.loggedIn)
-    // if (!settings.loggedIn) {
-    //   console.log("BREAKOUT")
-    //   clearTimeout(plexQueryTimeout);
-    //   return false;
-    // }
+
     console.log("PLEX QUERY START", ip, token)
     console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
     // console.log("SETTINGS: ", settings)
-    $.ajax({
-      //url: ip + '/status/sessions?X-Plex-Token=' + token,
-      url: ip + '/status/sessions',
-      type: 'GET',
-      dataType: 'json',
-      headers: {
-        'Accept': 'application/json',
-        'X-Plex-Token': token
-      }
-    })
-    .done((data) => {
-      console.log("PLEX QUERY SUCCESS")
-      console.log(data);
-      // var jsonData = xmlToJson(data)
-      // console.log(jsonData)
 
-      this.props.addPlexData(data)
-      hashHistory.push('/#/app')
-      // setHandleBarData(ip, token, data)
-      // console.log('LoggedIn: ', settings.loggedIn)
-        console.log("PING SERVER EVERY 30 seconds")
-        console.log("SERVER INTERVAL:", this.props.serverInterval);
+    //check internet connection
+    if (navigator.onLine) {
+      //true here means connected to network - not necessarily internet
+      $.ajax({
+        //url: ip + '/status/sessions?X-Plex-Token=' + token,
+        url: ip + '/status/sessions',
+        type: 'GET',
+        dataType: 'json',
+        headers: {
+          'Accept': 'application/json',
+          'X-Plex-Token': token
+        }
+      })
+      .done((data) => {
+        console.log("PLEX QUERY SUCCESS")
+        console.log(data);
+        // var jsonData = xmlToJson(data)
+        // console.log(jsonData)
 
-        plexQueryTimeout = setTimeout(() => {
-          this.plexQuery(ip, token);
-        }, this.props.serverInterval);
-        console.log("AFTER TIMEOUT")
+        this.props.addPlexData(data)
+        // hashHistory.push('/app')
+        // setHandleBarData(ip, token, data)
+        // console.log('LoggedIn: ', settings.loggedIn)
+          console.log("PING SERVER EVERY 30 seconds")
+          console.log("SERVER INTERVAL:", this.props.serverInterval);
 
-      // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
-    })
-    .fail(function(data) {
-      console.log("PLEX QUERY ERROR!");
-      console.log(data);
-    })
-    .always(function() {
-      console.log("PLEX QUERY RUN");
-    });
+          plexQueryTimeout = setTimeout(() => {
+            this.plexQuery(ip, token);
+          }, this.props.serverInterval);
+          console.log("AFTER TIMEOUT")
+
+        // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
+      })
+      .fail(function(data) {
+        console.log("PLEX QUERY ERROR!");
+        console.log(data);
+      })
+      .always(function() {
+        console.log("PLEX QUERY RUN");
+      });
+    }
+
+    //no internet connection
+    else {
+      this.props.updateUserCount(0);
+      plexQueryTimeout = setTimeout(() => {
+        this.plexQuery(ip, token);
+      }, this.props.serverInterval);
+      console.log("AFTER TIMEOUT")
+    }
   },
 
   // $password.parsley().on('field:error', function() {

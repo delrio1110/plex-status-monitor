@@ -53,6 +53,7 @@ export default React.createClass({
     ipcRenderer.send('asynchronous-message', appSettings);
   },
   render: function() {
+    
     var children = React.Children.map(this.props.children, (child) => {
       return React.cloneElement(child, {
         addPlexData: this.addPlexData,
@@ -66,7 +67,6 @@ export default React.createClass({
         updateUserCount: this.updateUserCount
       })
     })
-
 
     console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)
     return (
