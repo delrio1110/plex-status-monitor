@@ -123,7 +123,7 @@ export default React.createClass({
         this.props.updateUserIP(userInfo.ip)
         this.props.updateUserState(userInfo)
         this.stopSignInLoader()
-        this.plexQuery(userInfo.ip, userInfo.token);
+        // this.plexQuery(userInfo.ip, userInfo.token);
         console.log('HASH HISTORY CHANGE ROUTE')
         hashHistory.push('/app')
 
@@ -133,6 +133,7 @@ export default React.createClass({
       })
       .always(function() {
         console.log("Get Plex Ip Complete");
+        this.stopSignInLoader()
       });
   },
 

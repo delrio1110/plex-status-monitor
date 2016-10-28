@@ -53,7 +53,7 @@ export default React.createClass({
     ipcRenderer.send('asynchronous-message', appSettings);
   },
   render: function() {
-    
+
     var children = React.Children.map(this.props.children, (child) => {
       return React.cloneElement(child, {
         addPlexData: this.addPlexData,
@@ -62,7 +62,7 @@ export default React.createClass({
         serverInterval: this.state.serverInterval,
         loggedIn: this.state.loggedIn,
         plexData: this.state.plexData,
-        userToken: this.state.plexToken,
+        plexToken: this.state.plexToken,
         userIP: this.state.userIP,
         updateUserCount: this.updateUserCount
       })

@@ -1,29 +1,35 @@
 import React from 'react'
 import MediaItem from './MediaItem'
 import { msToTime } from '../helperFunctions'
+import { hashHistory } from 'react-router'
 import NoActiveUsers from './NoActiveUsers'
+import isOnline from 'is-online'
+// import ReactTimeout from 'react-timeout'
+// console.log(ReactTimeout) 
+// import TimerMixin from 'react-timer-mixin'
+// var TimerMixin = require('react-timer-mixin');
+
+// class Whatever extends React.Compoinent {
+//   r
+// }
+
 
 export default React.createClass({
+  // mixins: [TimerMixin],
+  timeout: null,
   getInitialState: function() {
     return {
       mediaInfo: []
     }
   },
-  // shouldComponentUpdate: function() {
-  //   if (!this.props.plexData) {
-  //     console.log(this.props.plexData.length)
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // },
   componentWillMount: function () {
     console.log('COMPONENT WILL MOUNT',this.props)
+    this.plexQuery(this.props.userIP, this.props.plexToken)
     this.setPlexData(this.props.plexData, this.props.userIP, this.props.plexToken)
   },
   componentWillReceiveProps: function(props) {
     console.log('COMPONENT WILL RECEIVE PROPS:', props)
-    this.setPlexData(props.plexData, props.userIP, props.userToken)
+    this.setPlexData(props.plexData, props.userIP, props.plexToken)
   },
   addMediaInfo: function(mediaInfoDataList) {
     this.notifyUser(mediaInfoDataList)
@@ -141,17 +147,91 @@ export default React.createClass({
 
     }
   },
+  componentWillUnmount () {
+    clearTimeout(this.timeout)
+  },
+  plexQuery: function(ip, token) {
+
+
+    console.log("PLEX QUERY START", ip, token)
+    console.log(ip + '/status/sessions'+ '?X-Plex-Token='+ token)
+    // console.log("SETTINGS: ", settings)
+
+    //check internet connection
+    if (navigator.onLine) {
+      //true here means connected to network - not necessarily internet
+      $.ajax({
+        //url: ip + '/status/sessions?X-Plex-Token=' + token,
+        url: ip + '/status/sessions',
+        type: 'GET',
+        dataType: 'json',
+        headers: {
+          'Accept': 'application/json',
+          'X-Plex-Token': token
+        }
+      })
+      .done((data) => {
+        console.log("PLEX QUERY SUCCESS")
+        console.log(data);
+        // var jsonData = xmlToJson(data)
+        // console.log(jsonData)
+
+        this.props.addPlexData(data)
+        console.log("PING SERVER EVERY 30 seconds")
+         console.log("SERVER INTERVAL:", this.props.serverInterval);
+
+          this.timeout = setTimeout(() => {
+            this.plexQuery(ip, token);
+          }, this.props.serverInterval);
+          console.log("AFTER TIMEOUT")
+
+        // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
+      })
+      .fail(function(data) {
+        console.log("PLEX QUERY ERROR!");
+        console.log("Is your server online?");
+        console.log(data);
+      })
+      .always(function() {
+        console.log("PLEX QUERY RUN");
+      });
+    }
+
+    //no internet connection
+    else {
+      this.props.updateUserCount(0);
+      plexQueryTimeout = setTimeout(() => {
+        this.plexQuery(ip, token);
+      }, this.props.serverInterval);
+      console.log("AFTER TIMEOUT")
+    }
+  },
+  logOut: function(timeOut) {
+    hashHistory.push('/')
+    console.log('logout');
+    let settings = {}
+    settings.loggedIn = false;
+    settings.isActive = false;
+    settings.userCount = 0;
+    ipcRenderer.send('asynchronous-message', settings);
+  },
   render: function() {
     console.log('render media info wrap')
+
+    let logOutButton = <button className="plex-button" onClick={this.logOut}>Logout</button>
     if (this.state.mediaInfo.length < 1) {
       return(
-        <NoActiveUsers/>
+        <div className='mediaInfoWrapper'>
+          <NoActiveUsers/>
+          {logOutButton}
+        </div>
       )
     } else {
       return(
         <div className='mediaInfoWrapper'>
           {this.state.mediaInfo.map((data, key) =>
             <MediaItem key={key} index={key} details={data} />)}
+          {logOutButton}
         </div>
       )
     }
