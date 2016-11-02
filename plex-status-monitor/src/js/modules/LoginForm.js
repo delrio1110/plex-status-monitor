@@ -76,6 +76,7 @@ export default React.createClass({
         $formError.show().html(responseText.error);
       }
       console.log("Login Fail!!!!", data)
+      this.stopSignInLoader();
     })
     .always(function() {
       console.log("Login Ajax finish");
@@ -122,7 +123,7 @@ export default React.createClass({
 
         this.props.updateUserIP(userInfo.ip)
         this.props.updateUserState(userInfo)
-        this.stopSignInLoader()
+        this.props.updateLoggedInState(true)
         // this.plexQuery(userInfo.ip, userInfo.token);
         console.log('HASH HISTORY CHANGE ROUTE')
         hashHistory.push('/app')
@@ -220,6 +221,8 @@ export default React.createClass({
         password: this.refs.password.value
       }
       this.logIn(userInfo);
+    } else {
+      this.stopSignInLoader()
     }
   },
   startSignInLoader: function() {

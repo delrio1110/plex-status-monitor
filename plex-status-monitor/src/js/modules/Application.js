@@ -29,7 +29,11 @@ export default React.createClass({
     this.setState({username: userObject.username})
     this.setState({password: userObject.password})
     this.setState({plexToken: userObject.token})
-    this.setState({loggedIn: true})
+    // this.setState({loggedIn: true})
+  },
+
+  updateLoggedInState: function(boolean) {
+    this.setState({loggedIn: boolean })
   },
 
   updateUserIP: function(ip) {
@@ -58,20 +62,22 @@ export default React.createClass({
       return React.cloneElement(child, {
         addPlexData: this.addPlexData,
         updateUserState: this.updateUserState,
+        updateLoggedInState: this.updateLoggedInState,
         updateUserIP: this.updateUserIP,
         serverInterval: this.state.serverInterval,
         loggedIn: this.state.loggedIn,
         plexData: this.state.plexData,
         plexToken: this.state.plexToken,
         userIP: this.state.userIP,
-        updateUserCount: this.updateUserCount
+        updateUserCount: this.updateUserCount,
+        // location: this.props.location
       })
     })
 
     console.log('PLEX DATA IS IN THE STATE!!', this.state.plexData)
     return (
       <div className='app'>
-        <Header/>
+        <Header loggedIn={this.state.loggedIn} location={this.props.location}/>
         {children}
       </div>
     )

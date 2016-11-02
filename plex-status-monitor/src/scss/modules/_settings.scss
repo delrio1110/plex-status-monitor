@@ -1,0 +1,25 @@
+.settingsLink {
+	text-decoration: none;
+	position: absolute;
+	top: 25px;
+	right: 25px;
+
+	&:active, &:hover {
+		text-decoration: none;
+	}
+
+	&.active i {
+		&.icon-cog:before {
+		  content: "\e904";
+		}
+	}
+}
+
+.icon-cog {
+	color: $plex-button;
+	text-decoration: none;
+
+	&:hover {
+		color: $plex-hover;
+	}
+}

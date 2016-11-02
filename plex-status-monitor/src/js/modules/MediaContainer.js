@@ -5,7 +5,7 @@ import { hashHistory } from 'react-router'
 import NoActiveUsers from './NoActiveUsers'
 import isOnline from 'is-online'
 // import ReactTimeout from 'react-timeout'
-// console.log(ReactTimeout) 
+// console.log(ReactTimeout)
 // import TimerMixin from 'react-timer-mixin'
 // var TimerMixin = require('react-timer-mixin');
 
@@ -213,6 +213,7 @@ export default React.createClass({
     settings.loggedIn = false;
     settings.isActive = false;
     settings.userCount = 0;
+    this.props.updateLoggedInState(false);
     ipcRenderer.send('asynchronous-message', settings);
   },
   render: function() {
