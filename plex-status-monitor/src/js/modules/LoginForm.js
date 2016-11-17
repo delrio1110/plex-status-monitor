@@ -69,7 +69,7 @@ export default React.createClass({
       // $('#login').hide()
       this.getPlexIp(userInfo);
     })
-    .fail(function(data, textStatus, errorThrown) {
+    .fail((data, textStatus, errorThrown) => {
       var responseText = jQuery.parseJSON(data.responseText);
 
       if(data.status > 399) {

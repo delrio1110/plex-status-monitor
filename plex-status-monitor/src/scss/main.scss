@@ -290,6 +290,9 @@ button.plex-button {
   border: 2px solid $plex-black;
   transition: border 0.3s;
   border-radius: 4px;
+  min-width: 400px;
+  min-height: 225px;
+  background-color: $black;
 
   &:hover {
     border: 2px solid $plex-ui;

@@ -17,7 +17,11 @@ export default class Settings extends React.Component {
               <input type="checkbox" id="showDockIcon" ref="showDockIcon" className="settingsCheckbox" />
             </div>
             <div className="input-field">
-              <label htmlFor="">Remember Login</label>
+              <label htmlFor="">Remember Login Credentials</label>
+              <input type="checkbox" id="showDockIcon" ref="showDockIcon" className="settingsCheckbox" />
+            </div>
+            <div className="input-field">
+              <label htmlFor="">Launch App on login</label>
               <input type="checkbox" id="showDockIcon" ref="showDockIcon" className="settingsCheckbox" />
             </div>
           </div>

@@ -19,6 +19,28 @@
     <script>
       window.ipcRenderer = require('electron').ipcRenderer;
       require('electron-connect').client.create()
+
+      // Importing this adds a right-click menu with 'Inspect Element' option
+      var remote = require('remote')
+      var Menu = remote.require('menu')
+      var MenuItem = remote.require('menu-item')
+
+      var rightClickPosition = null
+
+      var menu = new Menu()
+      var menuItem = new MenuItem({
+        label: 'Inspect Element',
+        click: function() {
+          remote.getCurrentWindow().inspectElement(rightClickPosition.x, rightClickPosition.y)
+        }
+      })
+      menu.append(menuItem)
+
+      window.addEventListener('contextmenu', function(e){
+        e.preventDefault()
+        rightClickPosition = {x: e.x, y: e.y}
+        menu.popup(remote.getCurrentWindow())
+      }, false)
     </script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="build/js/index.js"></script>

@@ -5,6 +5,9 @@ var BrowserWindow = electron.BrowserWindow
 var Dialog = electron.dialog
 var app = electron.app
 var appName = app.getName()
+var hashHistory = require('react-router').hashHistory
+
+// import { hashHistory } from {'react-router'}
 
 require('electron-debug')({
   showDevTools: true
@@ -47,7 +50,8 @@ mb.on('ready', function ready () {
       {
         label: 'Preferences...',
         click: function() {
-          new BrowserWindow()
+          mb.showWindow()
+          mb.window.send('settings-click');
         }
       },
       {

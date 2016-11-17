@@ -13,11 +13,22 @@ ipcRenderer.on('asynchronous-reply', function(event, arg) {
   console.log(arg); // prints "pong"
 });
 
+ipcRenderer.on('settings-click', function(event) {
+  hashHistory.push('/settings');
+});
+
 var settings = {
   'isActive' : false,
   'userCount': '0',
   'plexServerPort': ':32400',
-  'loggedIn': false
+  'loggedIn': false,
+  'debug': true
+}
+
+function debugLog(msg) {
+  if (settings.debug) {
+    console.log(msg)
+  }
 }
 
 //MODULES
@@ -87,7 +98,7 @@ var url = 'http://';
 // });
 
 function logOut() {
-  console.log('logout');
+  debugLog('logout');
   $('#user-section').html('');
   $logInForm.show();
   $logOutButton.hide();
