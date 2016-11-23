@@ -1,8 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, browserHistroy, hashHistory, IndexRoute } from 'react-router'
-// import storage from 'electron-json-storage'
 import 'parsleyjs'
+
+
 window.jQuery = window.$ = require('jquery');
 var Handlebars = require('handlebars');
 // require('electron-connect').client.create() //FOR GULP
@@ -16,20 +17,6 @@ ipcRenderer.on('asynchronous-reply', function(event, arg) {
 ipcRenderer.on('settings-click', function(event) {
   hashHistory.push('/settings');
 });
-
-var settings = {
-  'isActive' : false,
-  'userCount': '0',
-  'plexServerPort': ':32400',
-  'loggedIn': false,
-  'debug': true
-}
-
-function debugLog(msg) {
-  if (settings.debug) {
-    console.log(msg)
-  }
-}
 
 //MODULES
 import Application  from './modules/Application'
@@ -97,26 +84,10 @@ var url = 'http://';
 //   }
 // });
 
-function logOut() {
-  debugLog('logout');
-  $('#user-section').html('');
-  $logInForm.show();
-  $logOutButton.hide();
-  settings.loggedIn = false;
-  console.log("Logged in? ", settings.loggedIn);
-  settings.isActive = false;
-  settings.userCount = 0;
-  ipcRenderer.send('asynchronous-message', settings);
-}
 
 //RUN ON CLICK
 
 $('#login').parsley({errorsWrapper: '<ul class="parsley-errors-list animated pulse"></ul>'});
-
-
-$logOutButton.click(function() {
-  logOut();
-});
 
 $('input').focus(function() {
   if(!$(this).hasClass('icomoon-error')) {

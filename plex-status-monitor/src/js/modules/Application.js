@@ -2,12 +2,25 @@ import React from 'react'
 import LoginForm from './LoginForm'
 import Header from './Header'
 import MediaContainer from './MediaContainer'
+import storage from 'electron-json-storage'
+// const storage  = require('electron-json-storage');
+
+var ipcRenderer = window.ipcRenderer;
+ipcRenderer.on('app-settings', function(event, arg) {
+  console.log('RECEIVE APP SETTINGS'); // prints "pong"
+});
 
 
 // export default class Application extends React.Component {
 export default React.createClass({
 
   getInitialState: function() {
+
+  var ipcRenderer = window.ipcRenderer;
+    ipcRenderer.on('app-settings', function(event, arg) {
+    console.log(arg); // prints "pong"
+  });
+
     return {
       username: '',
       password: '',

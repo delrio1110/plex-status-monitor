@@ -132,7 +132,7 @@ export default React.createClass({
       .fail(function(data) {
         console.log("FAIL!!!!", data);
       })
-      .always(function() {
+      .always(() => {
         console.log("Get Plex Ip Complete");
         this.stopSignInLoader()
       });

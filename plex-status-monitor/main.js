@@ -6,8 +6,40 @@ var Dialog = electron.dialog
 var app = electron.app
 var appName = app.getName()
 var hashHistory = require('react-router').hashHistory
+// var settings = require('electron-settings');
+var storage = require('electron-json-storage')
 
-// import { hashHistory } from {'react-router'}
+//CLEAR STORAGE
+// storage.clear(function(error) {
+//   if (error) throw error;
+// });
+
+storage.set('settings', { 
+  refreshRate: 30000,
+  showDockIcon: false,
+  startOnLogin: false,
+  rememberLogin: false,
+  appState: {
+    isActive: false,
+    userCount: 0,
+    plexServerPort: ':32400',
+    loggedIn: false,
+    debug: false
+  },
+  userData: {
+    username: '',
+    password: '',
+  }
+}, function(error) {
+  if (error) throw error;
+});
+
+storage.getAll(function(error, data) {
+  if (error) throw error;
+
+  console.log('STORAGE DATA', data);
+});
+
 
 require('electron-debug')({
   showDevTools: true
@@ -62,13 +94,14 @@ mb.on('ready', function ready () {
       }
     ])
     mb.tray.popUpContextMenu(contextMenu);
+    mb.window.send('app-settings');
   });
   // mb.window.addDevToolsExtension('/Users/kevinknopp/Library/Application Support/Google/Chrome/' + 'default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.3_0');
   mb.tray.setPressedImage('IconPressed.png')
   mb.app.dock.setIcon('images/app-icon.png')
-  console.log(mb.window)
+  // console.log(mb.window)
   setTimeout(function() {
-    console.log(mb.window)
+    // console.log(mb.window)
   }, 5000)
 })
 
