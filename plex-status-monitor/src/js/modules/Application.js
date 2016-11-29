@@ -11,6 +11,12 @@ ipcRenderer.on('app-settings', function(event, arg) {
 });
 
 
+storage.get('foobar', function(error, data) {
+  if (error) throw error;
+
+  console.log(data);
+});
+
 // export default class Application extends React.Component {
 export default React.createClass({
 
