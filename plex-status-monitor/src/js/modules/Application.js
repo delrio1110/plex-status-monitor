@@ -2,7 +2,7 @@ import React from 'react'
 import LoginForm from './LoginForm'
 import Header from './Header'
 import MediaContainer from './MediaContainer'
-import storage from 'electron-json-storage'
+// import storage from 'electron-json-storage'
 // const storage  = require('electron-json-storage');
 
 var ipcRenderer = window.ipcRenderer;
@@ -11,11 +11,11 @@ ipcRenderer.on('app-settings', function(event, arg) {
 });
 
 
-storage.get('foobar', function(error, data) {
-  if (error) throw error;
+// storage.get('foobar', function(error, data) {
+//   if (error) throw error;
 
-  console.log(data);
-});
+//   console.log(data);
+// });
 
 // export default class Application extends React.Component {
 export default React.createClass({
