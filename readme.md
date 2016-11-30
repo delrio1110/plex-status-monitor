@@ -1,16 +1,14 @@
-# menubar
+# Plex Status Monitor
 
-High level way to create menubar desktop applications with electron
+Simple Menubar Application to see your plex server activity.
 
-This module provides boilerplate for setting up a menubar application using electron. all you have to do is point it at your `index.html` and menubar icon and this will handle opening/closing a window when you click/blur.
-
-Works on Mac OS, Windows and some Linuxes (Tested on Xfce4, your mileage may vary -- patches welcome!)
+Built with electron, but so far only test on Mac OS
 
 **Mac OS**
 
 ![screenshot](screenshot.png)
 
-**Windows**
+<!-- **Windows**
 
 ![screenshot](screenshot-windows.png)
 
@@ -18,17 +16,20 @@ Works on Mac OS, Windows and some Linuxes (Tested on Xfce4, your mileage may var
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-Watch the 1HR screen recording of me coding this module: https://www.youtube.com/watch?v=PAJAvsyaHs0
+Watch the 1HR screen recording of me coding this module: https://www.youtube.com/watch?v=PAJAvsyaHs0 -->
 
-This module was written for + is used by [Monu](https://github.com/maxogden/monu)
+This app was built using [Menubar](https://github.com/maxogden/menubar)
 
 ## installation
 
 ```
-npm install menubar --save
+git clone git@github.com:kknopper/plex-status-menubar.git
+cd plex-status-menubar/plex-status-monitor
+npm install
+gulp
 ```
 
-## usage
+<!-- ## usage
 
 create a JS program like this:
 
@@ -67,9 +68,9 @@ the return value of `mb` is an event emitter with these properties:
   showWindow(): show the menubar window,
   hideWindow(): hide the menubar window
 }
-```
+``` -->
 
-## options
+<!-- ## options
 
 you can pass an optional options object into the menubar constructor
 
@@ -105,3 +106,4 @@ the return value of the menubar constructor is an event emitter
 ## tips
 
 - Use `mb.on('after-create-window', callback)` to run things after your app has loaded. For example you could run `mb.window.openDevTools()` to open the developer tools for debugging, or load a different URL with `mb.window.loadUrl()`
+ -->
