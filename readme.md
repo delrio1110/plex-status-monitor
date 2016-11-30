@@ -2,7 +2,26 @@
 
 Simple Menubar Application to see your plex server activity.
 
-Built with electron, but so far only test on Mac OS
+Built with electron, but so far only tested on Mac OS.
+
+(App is still a work in progress)
+
+TODO:
+
+-[x] Refactor main app with React
+-[ ] Refactor Login UI with React (remove all jQuery)
+-[ ] Add App Settings/Preferences Page
+-[ ] Allow App Launch on Login
+-[ ] Allow Toggle of App Dock Icon
+-[ ] Allow Setting for Server Ping Rate
+-[ ] Add Film / Track Info Icon and data
+-[ ] Add Albulm artwork to Tracks
+
+Post Launch TODO:
+-[ ] Windows Support
+-[ ] Linux Support
+-[ ] Toggle for VectorArt / Image UI Styles
+- 
 
 **Mac OS**
 
