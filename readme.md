@@ -8,20 +8,19 @@ Built with electron, but so far only tested on Mac OS.
 
 TODO:
 
--[x] Refactor main app with React
--[ ] Refactor Login UI with React (remove all jQuery)
--[ ] Add App Settings/Preferences Page
--[ ] Allow App Launch on Login
--[ ] Allow Toggle of App Dock Icon
--[ ] Allow Setting for Server Ping Rate
--[ ] Add Film / Track Info Icon and data
--[ ] Add Albulm artwork to Tracks
+- [x] Refactor main app with React
+- [ ] Refactor Login UI with React (remove all jQuery)
+- [ ] Add App Settings/Preferences Page
+- [ ] Allow App Launch on Login
+- [ ] Allow Toggle of App Dock Icon
+- [ ] Allow Setting for Server Ping Rate
+- [ ] Add Film / Track Info Icon and data
+- [ ] Add Albulm artwork to Tracks
 
 Post Launch TODO:
--[ ] Windows Support
--[ ] Linux Support
--[ ] Toggle for VectorArt / Image UI Styles
-- 
+- [ ] Windows Support
+- [ ] Linux Support
+- [ ] Toggle for VectorArt / Image UI Styles 
 
 **Mac OS**
 
