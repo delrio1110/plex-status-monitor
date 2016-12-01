@@ -5,7 +5,6 @@ import 'parsleyjs'
 
 
 window.jQuery = window.$ = require('jquery');
-var Handlebars = require('handlebars');
 // require('electron-connect').client.create() //FOR GULP
 
 var ipcRenderer = window.ipcRenderer;
