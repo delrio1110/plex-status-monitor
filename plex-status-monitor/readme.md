@@ -24,7 +24,8 @@ Post Launch TODO:
 
 **Mac OS**
 
-![screenshot](screenshot.png)
+![screenshot](screenshot1.png)
+![screenshot](screenshot2.png)
 
 <!-- **Windows**
 
