@@ -1,7 +1,7 @@
 import React from 'react'
 import LoginForm from './LoginForm'
 import Header from './Header'
-import MediaContainer from './MediaContainer'
+import MediaContainer from './MediaContainerXML'
 // import storage from 'electron-json-storage'
 // const storage  = require('electron-json-storage');
 

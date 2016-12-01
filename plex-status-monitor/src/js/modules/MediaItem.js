@@ -14,7 +14,13 @@ export default React.createClass({
   },
 
   render: function() {
-    let userThumbImg = <img className="user-image" src={this.props.details.userThumb} alt="" />
+    
+    let userThumbImg
+    if (this.props.details.userId == '1') {
+      userThumbImg = <img className="user-image" src={this.props.details.userThumb} alt="" /> 
+    } else {
+      userThumbImg = <img className="user-image" src={this.props.details.userFriendAvatar} alt="" />
+    }
     let mediaDurationBarPercent = {width: this.props.details.mediaTimeLeft}
     let imageClassNames = 'media-image animate'
 

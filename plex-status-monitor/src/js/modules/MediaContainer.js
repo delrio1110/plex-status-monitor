@@ -173,6 +173,7 @@ export default React.createClass({
       .done((data) => {
         console.log("PLEX QUERY SUCCESS")
         console.log(data);
+        console.log(data.responseText)
         // var jsonData = xmlToJson(data)
         // console.log(jsonData)
 
@@ -187,10 +188,17 @@ export default React.createClass({
 
         // $('#test-image').attr('src', url + jsonData.MediaContainer.Video['@attributes'].art + '?X-Plex-Token=' + token);
       })
-      .fail(function(data) {
+      .fail((data) => {
         console.log("PLEX QUERY ERROR!");
-        console.log("Is your server online?");
         console.log(data);
+        console.log(data.responseText);
+
+        //run even if fail
+        this.props.addPlexData(data.responseText)
+        this.timeout = setTimeout(() => {
+            this.plexQuery(ip, token);
+          }, this.props.serverInterval);
+          console.log("AFTER TIMEOUT")
       })
       .always(function() {
         console.log("PLEX QUERY RUN");

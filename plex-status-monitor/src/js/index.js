@@ -22,7 +22,7 @@ ipcRenderer.on('settings-click', function(event) {
 import Application  from './modules/Application'
 import Home from './modules/Home'
 import LoginForm from './modules/LoginForm'
-import MediaContainer from './modules/MediaContainer'
+import MediaContainer from './modules/MediaContainerXML'
 import NotFound from './modules/NotFound'
 import NoActiveUsers from './modules/NoActiveUsers'
 import Settings from './modules/Settings'
