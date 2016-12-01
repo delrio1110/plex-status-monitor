@@ -69,6 +69,7 @@ export default React.createClass({
     if (Object.keys(data).length === 0) return
 
     else {
+      if (data.MediaContainer['@attributes'].size === '0') return
       console.log('SETTING PLEX DATA!', data.MediaContainer['@attributes'].size);
       console.log(data);
 
@@ -76,23 +77,25 @@ export default React.createClass({
 
       //TRACK DATA
       //IF NOT ARRAY MAKE IT AN ARRAY!
-      if (!Array.isArray(data.MediaContainer.Track)) {
+      if (!Array.isArray(data.MediaContainer.Track) && data.MediaContainer.Track) {
         data.MediaContainer.Track = [data.MediaContainer.Track];
+
+        for ( var i = 0; i < data.MediaContainer.Track.length; i++ ) {
+          let mediaInfoData = this.setPlexDataVariables(data, i, ip, token, 'Track')
+          mediaInfoDataList.push(mediaInfoData)
+        } 
       }
-      for ( var i = 0; i < data.MediaContainer.Track.length; i++ ) {
-        let mediaInfoData = this.setPlexDataVariables(data, i, ip, token, 'Track')
-        mediaInfoDataList.push(mediaInfoData)
-      } 
 
       //MOVIE / TV SHOW DATA
       //IF NOT ARRAY MAKE IT AN ARRAY!
-      if (!Array.isArray(data.MediaContainer.Video)) {
+      if (!Array.isArray(data.MediaContainer.Video) && data.MediaContainer.Video) {
         data.MediaContainer.Video = [data.MediaContainer.Video];
+        
+        for ( var i = 0; i < data.MediaContainer.Video.length; i++ ) {
+          let mediaInfoData = this.setPlexDataVariables(data, i, ip, token, 'Video')
+          mediaInfoDataList.push(mediaInfoData)
+        } // end for loop
       }
-      for ( var i = 0; i < data.MediaContainer.Video.length; i++ ) {
-        let mediaInfoData = this.setPlexDataVariables(data, i, ip, token, 'Video')
-        mediaInfoDataList.push(mediaInfoData)
-      } // end for loop
       this.addMediaInfo(mediaInfoDataList)
 
     } // end else
