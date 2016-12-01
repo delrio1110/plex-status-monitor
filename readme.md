@@ -42,8 +42,8 @@ This app was built using [Menubar](https://github.com/maxogden/menubar)
 ## installation
 
 ```
-git clone git@github.com:kknopper/plex-status-menubar.git
-cd plex-status-menubar/plex-status-monitor
+git clone git@github.com:kknopper/plex-status-monitor.git
+cd plex-status-monitor
 npm install
 gulp
 ```
